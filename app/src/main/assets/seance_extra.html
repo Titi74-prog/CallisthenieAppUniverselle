@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1a2e">
+<title>Séance Extra</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#f0efec;overflow:hidden}
+:root{
+  --bg:#0f0f13;--white:#1a1a22;--txt:#f0efec;--txt2:#b0aeb8;--txt3:#6b6a75;--border:#2a2a35;
+}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg)}
+#header{background:#1a1a22;padding:14px 16px 12px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+#header .header-left{display:flex;flex-direction:column;gap:4px}
+#header h1{font-size:18px;font-weight:800;color:var(--txt);letter-spacing:-.5px;line-height:1.1}
+#header h1 span{color:#0055A4}
+#header .header-sub{display:flex;align-items:center;gap:6px}
+#header .h-dot{width:4px;height:4px;border-radius:50%;background:linear-gradient(135deg,#5C6BC0,#A29BFE)}
+#header .h-tag{font-size:11px;font-weight:600;color:var(--txt3)}
+#header .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+#header-time{font-size:20px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+#header-date{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+#tabs{display:none;background:#1a1a22;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:0;padding:9px 4px;font-size:11px;font-weight:700;color:var(--txt3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;text-align:center;transition:color .2s;white-space:nowrap}
+.tab .tab-sub{display:block;font-size:9px;font-weight:500;margin-top:2px;color:var(--txt3)}
+.tab.active .tab-sub{color:inherit}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:70px}
+.session-header{padding:14px 16px;background:#1a1a22;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.session-badge{width:56px;height:56px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1.1}
+.session-badge .s-icon{font-size:20px}
+.session-badge .s-lbl{font-size:8px;color:#fff;opacity:.9;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;text-align:center;white-space:nowrap;width:100%;padding:0 4px}
+.session-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.session-meta{font-size:11px;color:var(--txt2)}
+.session-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:4px}
+.progress-wrap{padding:10px 16px;background:#1a1a22;border-bottom:1px solid var(--border)}
+.progress-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-lbl{font-size:12px;font-weight:600;color:var(--txt2)}
+.progress-pct{font-size:13px;font-weight:700}
+.progress-track{background:var(--border);border-radius:8px;height:7px;overflow:hidden}
+.progress-fill{height:7px;border-radius:8px;transition:width .5s}
+.round-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#1a1a22;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.round-lbl{font-size:12px;font-weight:700;color:var(--txt2)}
+.round-btn{width:36px;height:36px;border-radius:50%;border:2px solid;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none;transition:all .2s}
+.round-rest-btn{margin-left:auto;border:none;color:#fff;font-size:12px;font-weight:700;padding:8px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none}
+.warm-section{padding:12px 16px;background:#0d1f1a;border-bottom:1px solid #ddf2ec}
+.warm-title{font-size:11px;font-weight:700;color:#4ECDC4;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.warm-item{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(127,205,187,.2)}
+.warm-item:last-child{border:none}
+.warm-item-txt{flex:1;font-size:14px;color:var(--txt);font-weight:500}
+.warm-item-sub{font-size:11px;color:var(--txt3)}
+.warm-badge{color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.bloc-titre{margin:10px 0 6px;padding:10px 14px;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;border-radius:10px}
+.exo-list{padding:12px 12px 24px}
+.exo-card{background:#1a1a22;border:1.5px solid var(--border);border-radius:16px;margin-bottom:10px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.exo-card.open{box-shadow:0 4px 18px rgba(0,0,0,.1)}
+.exo-card.done{opacity:.55}
+.exo-card-header{display:flex;align-items:center;padding:13px 14px;gap:12px}
+.exo-num{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.exo-num.is-done{background:linear-gradient(135deg,#4ECDC4,#95E1D3)!important;color:#fff!important}
+.exo-info{flex:1;min-width:0}
+.exo-name{font-size:21px;font-weight:800;color:var(--txt);margin-bottom:6px;line-height:1.2}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:18px;font-weight:800;padding:4px 12px;border-radius:10px;line-height:1.2}
+.badge-kg{background:#FFD54F;color:#1a1a22}
+.exo-chevron{font-size:20px;color:var(--txt3);transition:transform .25s;line-height:1;flex-shrink:0}
+.exo-card.open .exo-chevron{transform:rotate(180deg)}
+.exo-detail{display:none;border-top:1px solid var(--border)}
+.exo-card.open .exo-detail{display:block}
+.exo-body{padding:13px 14px}
+.steps-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.step{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start}
+.step-num{width:24px;height:24px;min-width:24px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step-txt{font-size:15px;color:var(--txt2);line-height:1.55}
+.tip-box{background:#1f1a08;border-radius:10px;padding:10px 12px;margin:8px 0 4px;font-size:14px;color:#ffd93d;line-height:1.55;border-left:3px solid #ffd93d}
+.err-box{background:#1f0808;border-radius:10px;padding:10px 12px;margin:6px 0;font-size:14px;color:#FF6B6B;line-height:1.55;border-left:3px solid #FF6B6B}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btn-timer{margin-top:0;flex:1}
+.btn-timer{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:none;font-size:14px;font-weight:700;padding:12px 10px;border-radius:12px;cursor:pointer;-webkit-appearance:none}
+.btn-hold{background:linear-gradient(135deg,#7FCDBB,#4ECDC4);color:#fff}
+.btn-rest{background:rgba(255,255,255,.08);color:#b0aeb8;border:1.5px solid #3a3a45}
+.btn-done{display:flex;align-items:center;gap:8px;width:100%;background:#1a1a22;border:1.5px solid var(--border);color:var(--txt2);font-size:14px;font-weight:600;padding:11px 16px;border-radius:12px;cursor:pointer;margin-top:8px;-webkit-appearance:none;justify-content:center}
+.btn-done.is-done{border-color:#4ECDC4;color:#3db8b0;background:#f0fffe}
+.soir-sep{display:flex;align-items:center;gap:10px;margin:22px 4px 4px;color:#4DB6AC;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px}
+.soir-sep:before,.soir-sep:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#4DB6AC88,transparent)}
+.soir-titre{background:linear-gradient(135deg,rgba(0,137,123,.25),rgba(77,182,172,.12));color:#80CBC4;border:1px solid rgba(77,182,172,.35);text-transform:none;letter-spacing:0;font-size:17px}
+.bloc-sous{font-size:12px;font-weight:600;color:var(--txt2);margin-top:4px}
+.bloc-jour{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--txt3)}
+.bloc-jour.on{background:rgba(78,205,196,.18);color:#4ECDC4}
+.bloc-auto{font-size:11px;font-weight:600;color:var(--txt3);margin-top:6px}
+.conseil{margin:0 12px 80px;border-radius:16px;padding:13px 14px;font-size:14px;line-height:1.75;border:1px solid}
+.conseil-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.repos-wrap{padding:16px}
+.repos-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center}
+.repos-icon{font-size:36px;margin-bottom:8px}
+.repos-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.repos-txt{font-size:13px;color:var(--txt2);line-height:1.6}
+#timer-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.93);z-index:100;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(4px)}
+#timer-overlay.show{display:flex}
+#timer-label{font-size:14px;font-weight:700;color:#ffd93d;margin-bottom:12px;text-align:center;padding:0 24px}
+#timer-ring{position:relative;width:190px;height:190px;margin:8px 0}
+#timer-ring svg{width:190px;height:190px;transform:rotate(-90deg)}
+#timer-ring .ring-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:10}
+#timer-ring .ring-fg{fill:none;stroke:#5C6BC0;stroke-width:10;stroke-linecap:round;stroke-dasharray:534;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear}
+#timer-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:58px;font-weight:800;color:#fff;line-height:1}
+#timer-sec{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:24px;margin-top:4px}
+#btn-stop{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:15px;font-weight:600;padding:13px 36px;border-radius:16px;cursor:pointer;-webkit-appearance:none}
+
+#bottom-nav{display:flex;background:#1a1a22;border-top:1px solid #2a2a35;padding:3px 0;position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 2px;cursor:pointer;border:none;background:none;color:#6b6a75;font-size:9px;font-weight:600}
+.nav-btn.active{color:#FF7043}
+.nav-btn span{font-size:15px}
+
+/* v7.0 — Thème clair automatique (mode jour du téléphone) */
+@media (prefers-color-scheme: light){
+html,body{background:#f2f2f6;color:#1a1a22}
+:root{--bg:#f2f2f6;--white:#ffffff;--txt:#1a1a22;--txt2:#4f4d58;--txt3:#7d7b87;--border:#e2e2ea}
+#header{background:#ffffff}
+#tabs{background:#ffffff}
+.session-header{background:#ffffff}
+.progress-wrap{background:#ffffff}
+.round-bar{background:#ffffff}
+.warm-section{background:#e6f6f1;border-bottom:1px solid #cdeee4}
+.exo-card{background:#ffffff}
+.tip-box{background:#fff7dc;color:#8a6a00}
+.err-box{background:#ffecec;color:#c62828}
+.btn-rest{background:rgba(0,0,0,0.064);color:#4f4d58;border:1.5px solid #d0d0da}
+.btn-done{background:#ffffff}
+.soir-titre{color:#00796B}
+.bloc-jour{background:rgba(0,0,0,0.048)}
+#bottom-nav{background:#ffffff;border-top:1px solid #e2e2ea}
+.nav-btn{color:#7d7b87}
+[style*="rgba(255,255,255,.06)"]{background:rgba(0,0,0,.045)!important}
+.exo-card{box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.session-badge .s-icon{color:#fff}
+}
+.session-tours{font-size:13px;font-weight:800;margin-top:5px}
+.bloc-sous{text-transform:none;letter-spacing:0}
+.bloc-auto{text-transform:none;letter-spacing:0}
+.app-ver{font-size:10px;font-weight:600;color:#6b6a75;letter-spacing:.3px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="header">
+  <div class="header-left">
+    <h1>Séance Extra</h1>
+    <div class="header-sub">
+      <div class="h-dot"></div>
+      <span class="h-tag">Séance complémentaire<span class="app-ver" data-pre=" · "></span></span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="header-time"></div>
+    <div id="header-date"></div>
+  </div>
+</div>
+<div id="tabs"></div>
+<div id="content"></div>
+</div>
+<div id="timer-overlay">
+  <div id="timer-label">Repos</div>
+  <div id="timer-ring">
+    <svg viewBox="0 0 190 190"><circle class="ring-bg" cx="95" cy="95" r="85"/><circle class="ring-fg" id="ring-fg" cx="95" cy="95" r="85"/></svg>
+    <div id="timer-num">0</div>
+  </div>
+  <div id="timer-sec">secondes</div>
+  <div style="display:flex;gap:12px;margin-bottom:16px;">
+    <button id="btn-minus5" onclick="adjustTimer(-5)" style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:18px;font-weight:700;padding:10px 18px;border-radius:14px;cursor:pointer;">−5s</button>
+    <button id="btn-plus5" onclick="adjustTimer(5)" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);color:#fff;font-size:18px;font-weight:700;padding:10px 18px;border-radius:14px;cursor:pointer;">+5s</button>
+  </div>
+  <button id="btn-stop" onclick="stopTimer()">Arreter</button>
+</div>
+<script src="seance.js"></script>
+<script>
+/* Séance par défaut — modifiable dans l'appli (⚙️ Paramétrer la séance) */
+var DEFAULTS=[
+/* ─── EXTRA : Chaise romaine (3 tours) ─── */
+{id:'X',letter:'💪',col:'E',day:'Extra',time:'',dur:'~45 min',
+ name:'Séance Extra',desc:'Barre de traction / chaise romaine + renforcement haltères',
+ conseil:'Tractions, dips et abdos : 60 s de repos entre les exercices, 90 s entre les tours. Mouvements stricts, sans élan : la qualité avant le nombre de répétitions.\n\nRenforcement haltères : tempo 4-0-2 (4 s de descente, 2 s de montée). Marque chaque exercice terminé : le repos se lance tout seul. Choisis une charge qui permet 15 répétitions propres.',
+ warmup:[],
+ blocs:[
+ {titre:'Chaise romaine — poids de corps',type:'rounds',maxRounds:3,restSec:90,autoRest:true,
+  exos:[
+  {name:'Tractions — prise large',reps:'15 rép.',rest:60,hold:0,kg:'',
+   steps:['Saisir la barre en prise large, paumes vers l\'avant.','Partir bras tendus, corps gainé.','Tirer jusqu\'à ce que le menton dépasse la barre.','Redescendre lentement sur 4 sec — bras bien tendus.'],
+   tip:'💡 Si 15 rép. impossibles : fais le max puis complète en négatifs (monter avec élan, descendre sur 4 sec).',
+   erreur:'⚠ Ne pas balancer le corps — mouvement strict.'},
+  {name:'Tractions — prise serrée',reps:'15 rép.',rest:60,hold:0,kg:'',
+   steps:['Saisir la barre en prise serrée, paumes vers soi.','Partir bras tendus, coudes le long du corps.','Tirer en amenant les coudes vers les hanches.','Redescendre lentement sur 4 sec.'],
+   tip:'💡 Prise serrée cible davantage les biceps que la prise large.',
+   erreur:'⚠ Ne pas balancer — contrôle total.'},
+  {name:'Dips — triceps',reps:'15 rép.',rest:60,hold:0,kg:'',
+   steps:['Saisir les barres parallèles, bras tendus.','Descendre lentement en fléchissant les coudes — 3 sec.','Buste légèrement penché en avant.','Remonter en soufflant — bras tendus sans verrouiller.'],
+   tip:'💡 Plus tu te penches en avant, plus les pectoraux travaillent. Buste droit = triceps.',
+   erreur:'⚠ Ne pas descendre trop bas — coudes à 90° maximum.'},
+  {name:'Relevés de jambes — chaise romaine',reps:'15 rép.',rest:60,hold:0,kg:'',
+   steps:['S\'installer dans la chaise romaine, bras sur les accoudoirs.','Dos plaqué au dossier.','Lever les genoux vers la poitrine en expirant.','Descendre lentement — pas d\'élan.'],
+   tip:'💡 Mouvement lent et contrôlé — pas de balancement.',
+   erreur:'⚠ Ne pas balancer les jambes pour prendre de l\'élan.'},
+  {name:'Relevés de jambes tendues — chaise romaine',reps:'10 rép.',rest:60,hold:0,kg:'',
+   steps:['Même position, jambes tendues cette fois.','Lever les jambes jusqu\'à l\'horizontale en expirant.','Tenir 1 sec en haut.','Descendre lentement — contrôle total.'],
+   tip:'💡 Plus difficile que les genoux fléchis — si trop dur, revenir aux genoux fléchis.',
+   erreur:'⚠ Ne pas laisser les jambes tomber — descente contrôlée.'},
+  {name:'Crunchs — au sol',reps:'15 rép.',rest:90,hold:0,kg:'',
+   steps:['Allongé au sol, genoux fléchis, pieds à plat.','Mains derrière la tête ou croisées sur la poitrine.','Contracter les abdos pour monter les épaules du sol.','Descendre lentement sur 3 sec — ne pas poser complètement.'],
+   tip:'💡 Amplitude courte et contrôlée — épaules décollent, pas le bas du dos.',
+   erreur:'⚠ Ne pas tirer sur le cou avec les mains.'},
+ ]},
+ /* ─── Renforcement haltères ─── */
+ {titre:'Renforcement haltères',type:'rounds',maxRounds:3,restSec:90,autoRest:true,
+  exos:[
+  {name:'Rowing haltère penché',reps:'15 rép.',rest:60,hold:0,kg:'',note:'Tempo 4-0-2',
+   steps:['Un genou et une main en appui sur un banc (ou buste penché à 45°, dos plat).','Haltère bras tendu sous l\'épaule.','Tirer le coude vers la hanche en 2 sec, omoplate serrée.','Redescendre lentement sur 4 sec, bras tendu. 15 rép. de chaque côté.'],
+   tip:'💡 Tempo 4-0-2 : 4 s de descente, pas de pause en bas, 2 s de montée.',
+   erreur:'⚠ Ne pas arrondir le dos ni tourner le buste pour tirer.'},
+  {name:'Développé épaules',reps:'15 rép.',rest:60,hold:0,kg:'',note:'Tempo 4-0-2',
+   steps:['Assis ou debout, gainé, haltères à hauteur des épaules, paumes vers l\'avant.','Pousser au-dessus de la tête en 2 sec sans verrouiller les coudes.','Redescendre sur 4 sec jusqu\'aux épaules.','Enchaîner sans pause en bas.'],
+   tip:'💡 Serrer les fessiers et les abdos pour protéger le bas du dos.',
+   erreur:'⚠ Ne pas cambrer le dos en poussant.'},
+  {name:'Curl biceps',reps:'15 rép.',rest:60,hold:0,kg:'',note:'Tempo 4-0-2',
+   steps:['Debout, haltères bras tendus, paumes vers l\'avant.','Coudes collés au corps.','Monter en 2 sec en contractant les biceps.','Redescendre sur 4 sec jusqu\'à l\'extension complète.'],
+   tip:'💡 Descente lente = l\'essentiel du travail.',
+   erreur:'⚠ Pas d\'élan avec le dos, les coudes restent fixes.'},
+  {name:'Écarté haltères au sol',reps:'15 rép.',rest:90,hold:0,kg:'',note:'Tempo 4-0-2',
+   steps:['Allongé au sol, genoux fléchis, haltères au-dessus de la poitrine, paumes face à face.','Coudes légèrement fléchis.','Ouvrir les bras sur 4 sec jusqu\'à ce que les coudes effleurent le sol.','Refermer en 2 sec en serrant les pectoraux.'],
+   tip:'💡 Le sol limite l\'amplitude : les épaules sont protégées.',
+   erreur:'⚠ Ne pas tendre complètement les bras ni laisser tomber les haltères.'},
+ ]},
+ ]},
+];
+
+PAGE={key:'extra',widget:false,today:false,days:[{tab:'Extra'}],defaults:DEFAULTS};
+initSeances();
+</script>
+
+<div id="bottom-nav">
+  <button class="nav-btn" onclick="navTo('programme')"><span>🏋️</span>Programme</button>
+  <button class="nav-btn" onclick="navTo('respiration')"><span>🫁</span>Respiration</button>
+  <button class="nav-btn" onclick="navTo('poids')"><span>⚖️</span>Poids</button>
+  <button class="nav-btn active" onclick="navTo('extra')"><span>💪</span>Extra</button>
+  <button class="nav-btn" onclick="navTo('sante')"><span>📊</span>Santé</button>
+</div>
+</body>
+</html>

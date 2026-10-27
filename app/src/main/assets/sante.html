@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Santé</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0f0f13;--card:#1a1a22;--in:#0f0f13;--t:#f0efec;--t2:#b0aeb8;--t3:#6b6a75;--bd:#2a2a35;--acc:#5C6BC0;--ok:#4ECDC4;--warn:#F9A825;--bad:#EF5350}
+@media (prefers-color-scheme: light){:root{--bg:#f2f2f6;--card:#ffffff;--in:#f2f2f6;--t:#1a1a22;--t2:#4f4d58;--t3:#7d7b87;--bd:#e2e2ea}}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto}
+#header{background:var(--card);padding:14px 16px 12px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#header h1{font-size:18px;font-weight:800}
+.h-sub{font-size:11px;color:var(--t3);font-weight:600;margin-top:2px}
+.h-r{display:flex;gap:6px}
+.h-r button{background:var(--in);border:1px solid var(--bd);color:var(--t2);border-radius:10px;font-size:16px;width:38px;height:36px;cursor:pointer}
+#content{flex:1;overflow-y:auto;padding:12px 12px 90px;-webkit-overflow-scrolling:touch}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-title b{font-weight:700;color:var(--t3);text-transform:none;letter-spacing:0}
+.status{font-size:13px;color:var(--t2);line-height:1.55}
+.status .btns{margin-top:12px}
+.btns{display:flex;gap:8px}
+.btn{flex:1;border:none;border-radius:12px;padding:12px 8px;font-size:13.5px;font-weight:800;cursor:pointer;-webkit-appearance:none}
+.btn-main{background:linear-gradient(135deg,#5C6BC0,#7986CB);color:#fff}
+.btn-sec{background:var(--in);color:var(--t2);border:1px solid var(--bd)}
+.per{display:flex;gap:6px;margin-bottom:12px;align-items:center}
+.per button{flex:1;border:1px solid var(--bd);background:var(--card);color:var(--t3);font-size:12.5px;font-weight:700;padding:8px 4px;border-radius:10px;cursor:pointer}
+.per button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.per .nav{flex:0 0 38px}
+.rings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ring{background:var(--in);border-radius:14px;padding:10px 6px;text-align:center}
+.ring svg{width:74px;height:74px;display:block;margin:0 auto 4px}
+.ring-v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.ring-l{font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+.ring-s{font-size:10.5px;color:var(--t2);margin-top:2px}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.mini{background:var(--in);border-radius:12px;padding:9px 10px}
+.mini-l{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.mini-v{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.mini-v small{font-size:11px;font-weight:600;color:var(--t2);margin-left:2px}
+.mini-s{font-size:10.5px;color:var(--t3);margin-top:1px}
+.tabs2{display:flex;gap:6px}
+.tabs2 button{border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;cursor:pointer;text-transform:none;letter-spacing:0}
+.tabs2 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chart svg{width:100%;height:auto;display:block}
+.sum{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-top:8px;gap:8px;flex-wrap:wrap}
+.sum b{color:var(--t);font-variant-numeric:tabular-nums}
+.act{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.act:last-child{border:none}
+.act .ic{font-size:20px;width:30px;text-align:center}
+.act .nm{flex:1;font-size:14px;font-weight:700}
+.act .nm small{display:block;font-size:11.5px;color:var(--t3);font-weight:500;margin-top:1px}
+.act .kc{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--warn)}
+.empty{font-size:13px;color:var(--t3);text-align:center;padding:10px}
+.sleep-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 6px;background:var(--bd)}
+.sleep-bar div{height:100%}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--t3)}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.big{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+.big small{font-size:14px;font-weight:600;color:var(--t2);margin-left:3px}
+.note{font-size:11.5px;color:var(--t3);line-height:1.5;margin-top:8px}
+.upd{font-size:11px;color:var(--t3);text-align:center;margin:4px 0 10px}
+/* Objectifs */
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px 20px}
+.sheet h2{font-size:17px;font-weight:800;margin-bottom:14px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.f input{width:100%;background:var(--in);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:17px;font-weight:700;padding:10px 12px;font-family:inherit;-webkit-appearance:none}
+.f input:focus{outline:none;border-color:var(--acc)}
+.frow{display:flex;gap:10px}.frow .f{flex:1;min-width:0}
+#bottom-nav{display:flex;background:var(--card);border-top:1px solid var(--bd);padding:3px 0;position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 2px;cursor:pointer;border:none;background:none;color:var(--t3);font-size:9px;font-weight:600}
+.nav-btn.active{color:#29B6F6}
+.nav-btn span{font-size:15px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div><h1>Santé</h1><div class="h-sub">Health Connect<span class="app-ver" data-pre=" · "></span></div></div>
+    <div class="h-r"><button onclick="openObj()" aria-label="Objectifs">🎯</button><button onclick="refresh(true)" aria-label="Actualiser">⟳</button></div>
+  </div>
+  <div id="content">
+    <div class="card" id="st-card" style="display:none"><div class="status" id="st"></div></div>
+
+    <div class="card">
+      <div class="card-title">☀️ Aujourd'hui <b id="today-d"></b></div>
+      <div class="rings">
+        <div class="ring" id="r-steps"></div>
+        <div class="ring" id="r-act"></div>
+        <div class="ring" id="r-sleep"></div>
+      </div>
+      <div class="minis">
+        <div class="mini"><div class="mini-l">Calories</div><div class="mini-v" id="m-kcal">—</div><div class="mini-s">total brûlé</div></div>
+        <div class="mini"><div class="mini-l">Distance</div><div class="mini-v" id="m-km">—</div><div class="mini-s">km</div></div>
+        <div class="mini"><div class="mini-l">Étages</div><div class="mini-v" id="m-fl">—</div><div class="mini-s">montés</div></div>
+      </div>
+    </div>
+
+    <div class="per">
+      <button class="nav" id="w-prev" onclick="weekNav(-1)">◀</button>
+      <button data-p="week" onclick="setPeriod('week')">Semaine</button>
+      <button data-p="month" onclick="setPeriod('month')">30 jours</button>
+      <button data-p="year" onclick="setPeriod('year')">Année</button>
+      <button class="nav" id="w-next" onclick="weekNav(1)">▶</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span id="ch-title">📊 Activité</span>
+        <div class="tabs2" id="metric">
+          <button data-m="steps" onclick="setMetric('steps')">Pas</button><button data-m="active" onclick="setMetric('active')">Actives</button><button data-m="kcal" onclick="setMetric('kcal')">Total</button>
+        </div>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="sum" id="ch-sum"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏃 Séances <b id="act-n"></b></div>
+      <div id="acts"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">😴 Sommeil <b id="sl-d"></b></div>
+      <div id="sleep"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">❤️ Cœur</div>
+      <div class="minis" style="margin-top:0">
+        <div class="mini"><div class="mini-l">Repos</div><div class="mini-v" id="h-rhr">—</div><div class="mini-s">bpm</div></div>
+        <div class="mini"><div class="mini-l">Moy. jour</div><div class="mini-v" id="h-avg">—</div><div class="mini-s" id="h-max">bpm</div></div>
+        <div class="mini"><div class="mini-l">VFC</div><div class="mini-v" id="h-hrv">—</div><div class="mini-s">ms (RMSSD)</div></div>
+        <div class="mini"><div class="mini-l">VO2 max</div><div class="mini-v" id="h-vo2">—</div><div class="mini-s">ml/kg/min</div></div>
+        <div class="mini"><div class="mini-l">SpO2</div><div class="mini-v" id="h-spo2">—</div><div class="mini-s">% nuit</div></div>
+        <div class="mini"><div class="mini-l">Peau</div><div class="mini-v" id="h-skin">—</div><div class="mini-s">écart °C</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚖️ Composition <b id="c-d"></b></div>
+      <div class="minis" style="margin-top:0">
+        <div class="mini"><div class="mini-l">Poids</div><div class="mini-v" id="c-w">—</div><div class="mini-s">kg</div></div>
+        <div class="mini"><div class="mini-l">Masse grasse</div><div class="mini-v" id="c-bf">—</div><div class="mini-s">%</div></div>
+        <div class="mini"><div class="mini-l">Masse maigre</div><div class="mini-v" id="c-lm">—</div><div class="mini-s">kg</div></div>
+        <div class="mini"><div class="mini-l">Métabolisme</div><div class="mini-v" id="c-bmr">—</div><div class="mini-s">kcal/j</div></div>
+      </div>
+      <div class="note">Données de ta balance connectée ou de ta montre, si elles écrivent dans Health Connect. La courbe complète est dans l'onglet <b>Poids</b>.</div>
+    </div>
+    <div class="upd" id="upd"></div>
+  </div>
+</div>
+
+<div class="sheet-bg" id="sh-obj" onclick="if(event.target===this)closeObj()">
+  <div class="sheet">
+    <h2>🎯 Objectifs quotidiens</h2>
+    <div class="frow">
+      <div class="f"><label>Pas / jour</label><input type="number" id="o-steps" inputmode="numeric" step="500" min="0"></div>
+      <div class="f"><label>Calories actives</label><input type="number" id="o-act" inputmode="numeric" step="50" min="0"></div>
+    </div>
+    <div class="f"><label>Sommeil (heures)</label><input type="number" id="o-sleep" inputmode="decimal" step="0.5" min="0" max="14"></div>
+    <div class="btns"><button class="btn btn-sec" onclick="closeObj()">Annuler</button><button class="btn btn-main" onclick="saveObj()">✓ Enregistrer</button></div>
+    <div class="btns" style="margin-top:10px"><button class="btn btn-sec" onclick="hcSettings()">⚙️ Sources Health Connect</button></div>
+  </div>
+</div>
+
+<div id="bottom-nav">
+  <button class="nav-btn" onclick="navTo('programme')"><span>🏋️</span>Programme</button>
+  <button class="nav-btn" onclick="navTo('respiration')"><span>🫁</span>Respiration</button>
+  <button class="nav-btn" onclick="navTo('poids')"><span>⚖️</span>Poids</button>
+  <button class="nav-btn" onclick="navTo('extra')"><span>💪</span>Extra</button>
+  <button class="nav-btn active" onclick="navTo('sante')"><span>📊</span>Santé</button>
+</div>
+
+<script>
+var LT=false;try{LT=window.matchMedia('(prefers-color-scheme: light)').matches;}catch(e){}
+function $(id){return document.getElementById(id);}
+function navTo(p){var m={programme:'programme.html',respiration:'respiration.html',poids:'poids.html',extra:'seance_extra.html',sante:'sante.html'};if(m[p])location.href='file:///android_asset/'+m[p];}
+try{var v=window.App&&App.version();if(v)document.querySelectorAll('.app-ver').forEach(function(e){e.textContent=e.getAttribute('data-pre')+'v'+v;});}catch(e){}
+function prefGet(k){var v=null;try{if(window.App&&App.getPref)v=App.getPref(k);}catch(e){}if(v==null){try{v=localStorage.getItem(k);}catch(e){}}return v;}
+function prefSet(k,v){try{if(window.App&&App.setPref)App.setPref(k,v);}catch(e){}try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+function jGet(k,def){try{var v=JSON.parse(prefGet(k));return v==null?def:v;}catch(e){return def;}}
+function cacheGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+function cacheSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+var OBJ=Object.assign({steps:8000,active:400,sleep:7.5},jGet('sante_obj',{}));
+var PERIOD=prefGet('sante_period')||'week',WEEK_OFF=0,METRIC=prefGet('sante_metric')||'steps',DATA=null;
+
+var JOURS=['Di','Lu','Ma','Me','Je','Ve','Sa'],JOURS_L=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+var MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function ld(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function pd(s){return new Date(s+'T12:00:00');}
+function nf(v){return v==null||isNaN(v)?'—':Math.round(v).toLocaleString('fr-FR');}
+function d1(v){return v==null||isNaN(v)?'—':(Math.round(v*10)/10).toString().replace('.',',');}
+function hm(min){if(min==null||isNaN(min))return '—';var h=Math.floor(min/60),m=Math.round(min%60);if(m===60){h++;m=0;}return h+'h'+String(m).padStart(2,'0');}
+function hhmm(iso){var d=new Date(iso);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function ago(iso){if(!iso)return '';var n=Math.floor((Date.now()-new Date(iso).getTime())/864e5);return n<=0?"aujourd'hui":n===1?'hier':'il y a '+n+' j';}
+
+/* ── Anneaux ── */
+function ring(el,val,goal,color,label,txt,sub){
+  var p=goal>0&&val!=null?Math.min(1,val/goal):0,R=30,C=2*Math.PI*R;
+  var bg=LT?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)';
+  $(el).innerHTML='<svg viewBox="0 0 74 74"><circle cx="37" cy="37" r="'+R+'" fill="none" stroke="'+bg+'" stroke-width="7"/>'
+    +'<circle cx="37" cy="37" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-p)).toFixed(1)+'" transform="rotate(-90 37 37)"/>'
+    +'<text x="37" y="42" text-anchor="middle" font-size="14" font-weight="800" fill="'+color+'" font-family="-apple-system,sans-serif">'+(val==null?'—':Math.round(p*100)+'%')+'</text></svg>'
+    +'<div class="ring-v">'+txt+'</div><div class="ring-l">'+label+'</div><div class="ring-s">'+sub+'</div>';
+}
+
+/* ── Statut / autorisations ── */
+function status(html,btns){
+  $('st-card').style.display=html?'block':'none';
+  $('st').innerHTML=html?(html+(btns?'<div class="btns">'+btns+'</div>':'')):'';
+}
+function askPerms(){try{HealthBridge.askPermissions();}catch(e){}}
+function hcSettings(){try{HealthBridge.openSettings();}catch(e){alert('Disponible uniquement dans l\'appli Android.');}}
+
+function refresh(force){
+  if(typeof window.HealthBridge==='undefined'){
+    status('📱 Les données santé sont lues depuis <b>Health Connect</b> : cet onglet fonctionne dans l\'appli Android.');return;
+  }
+  if(force)$('upd').textContent='Actualisation…';
+  try{HealthBridge.requestDataForPeriod(PERIOD==='week'?(WEEK_OFF?'week:'+WEEK_OFF:'week'):PERIOD);}catch(e){}
+}
+window.onHealthData=function(d){
+  if(!d)return;
+  if(d.status==='unavailable'){status('Health Connect n\'est pas disponible sur ce téléphone. Installe <b>Health Connect</b> depuis le Play Store (Android 13 et moins) puis reviens ici.','<button class="btn btn-main" onclick="refresh(true)">Réessayer</button>');return;}
+  if(d.status==='update_required'){status('Health Connect doit être mis à jour depuis le Play Store.','<button class="btn btn-main" onclick="refresh(true)">Réessayer</button>');return;}
+  if(d.status==='denied'){status('Autorise Callisthénie à <b>lire</b> tes données (pas, calories, sommeil, cœur, poids) dans Health Connect.<br>Les données restent sur le téléphone.','<button class="btn btn-main" onclick="askPerms()">Autoriser</button><button class="btn btn-sec" onclick="hcSettings()">Réglages</button>');return;}
+  if(d.status!=='ok'){status('Lecture impossible : '+(d.message||d.status),'<button class="btn btn-main" onclick="refresh(true)">Réessayer</button>');return;}
+  if(d.grantedCount<d.requested)status('Certaines autorisations ne sont pas accordées ('+d.grantedCount+'/'+d.requested+') : quelques cartes peuvent rester vides.','<button class="btn btn-sec" onclick="askPerms()">Compléter</button>');
+  else status('');
+  DATA=d;
+  cacheSet('sante_cache_'+(d.period==='week'?'week'+d.weekOffset:d.period),d);
+  render();
+};
+
+/* ── Rendu ── */
+function todayRow(d){
+  var t=ld(new Date());
+  return (d.days||[]).filter(function(x){return x.date===t;})[0]||null;
+}
+function render(){
+  var d=DATA;if(!d)return;
+  document.querySelectorAll('.per button[data-p]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-p')===PERIOD);});
+  $('w-prev').style.visibility=$('w-next').style.visibility=PERIOD==='week'?'visible':'hidden';
+  $('w-next').disabled=WEEK_OFF>=0;$('w-next').style.opacity=WEEK_OFF>=0?.35:1;
+  var now=new Date();$('today-d').textContent=JOURS_L[now.getDay()]+' '+now.getDate()+' '+MOIS[now.getMonth()];
+
+  /* Aujourd'hui (ou dernier jour reçu si on regarde une autre semaine) */
+  var td=todayRow(d)||cacheToday||{};
+  if(todayRow(d))cacheToday=td;
+  var lastSleep=(d.sleep||[]).slice(-1)[0];
+  ring('r-steps',td.steps,OBJ.steps,'#4ECDC4','Pas',nf(td.steps),'objectif '+nf(OBJ.steps));
+  ring('r-act',td.active,OBJ.active,'#FF7043','Actives',td.active!=null?nf(td.active)+' kcal':'—','objectif '+nf(OBJ.active));
+  var slMin=lastSleep&&ago(lastSleep.end).match(/aujourd|hier/)?lastSleep.min-(lastSleep.awake||0):null;
+  ring('r-sleep',slMin,OBJ.sleep*60,'#7E57C2','Sommeil',slMin!=null?hm(slMin):'—','objectif '+hm(OBJ.sleep*60));
+  $('m-kcal').textContent=nf(td.kcal);
+  $('m-km').textContent=td.km!=null?d1(td.km):'—';
+  $('m-fl').textContent=td.floors!=null?nf(td.floors):'—';
+
+  renderChart(d);renderActs(d);renderSleep(d);
+
+  /* Cœur */
+  var rhr=(d.days||[]).filter(function(x){return x.rhr;}).slice(-1)[0];
+  $('h-rhr').textContent=rhr?rhr.rhr:'—';
+  $('h-avg').textContent=d.hrAvgToday!=null?d.hrAvgToday:'—';
+  $('h-max').textContent=d.hrMaxToday!=null?'max '+d.hrMaxToday+' bpm':'bpm';
+  $('h-hrv').textContent=d.hrv!=null?d.hrv:'—';
+  $('h-vo2').textContent=d.vo2max?d1(d.vo2max.v):'—';
+  var sp=d.spo2||[];$('h-spo2').textContent=sp.length?d1(sp.reduce(function(a,x){return a+x.pct;},0)/sp.length):'—';
+  $('h-skin').textContent=d.skinTempDelta!=null?(d.skinTempDelta>0?'+':'')+String(d.skinTempDelta).replace('.',','):'—';
+
+  /* Composition */
+  var w=(d.weights||[]).slice(-1)[0];
+  $('c-w').textContent=w?d1(w.kg):'—';
+  $('c-bf').textContent=d.bodyFat?d1(d.bodyFat.pct):'—';
+  $('c-lm').textContent=d.leanMass?d1(d.leanMass.kg):'—';
+  $('c-bmr').textContent=d.bmr?nf(d.bmr.kcal):'—';
+  $('c-d').textContent=w?ago(w.t):'';
+  $('upd').textContent=d.updated?'Mis à jour à '+hhmm(d.updated):'';
+}
+var cacheToday=null;
+
+function renderChart(d){
+  document.querySelectorAll('#metric button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-m')===METRIC);});
+  var M={steps:{c:'#4ECDC4',goal:OBJ.steps,u:'pas',t:'📊 Pas'},active:{c:'#FF7043',goal:OBJ.active,u:'kcal',t:'🔥 Calories actives'},kcal:{c:'#F9A825',goal:0,u:'kcal',t:'⚡ Calories totales'}}[METRIC];
+  $('ch-title').textContent=M.t;
+  var days=d.days||[],today=ld(new Date());
+  /* Année : regroupement par mois */
+  var bars;
+  if(d.period==='year'){
+    var bym={};days.forEach(function(x){var m=+x.date.slice(5,7)-1;if(!bym[m])bym[m]={s:0,n:0};if(x[METRIC]!=null){bym[m].s+=x[METRIC];bym[m].n++;}});
+    bars=MOIS.map(function(m,i){var o=bym[i];return {l:m.slice(0,3),v:o&&o.n?o.s/o.n:null,fut:false};});
+  }else{
+    bars=days.map(function(x){var dt=pd(x.date);return {l:d.period==='week'?JOURS[dt.getDay()]:(dt.getDate()%5===1||days.length<=10?String(dt.getDate()):''),v:x[METRIC]!=null?x[METRIC]:null,fut:x.date>today,today:x.date===today};});
+  }
+  var vals=bars.map(function(b){return b.v||0;}),mx=Math.max.apply(null,vals.concat([M.goal||0,1]))*1.1;
+  var W=340,H=170,L=4,R=4,T=8,B=20,n=bars.length,bw=(W-L-R)/n,gap=n>20?1.5:Math.min(10,bw*.3);
+  function Y(v){return T+(1-v/mx)*(H-T-B);}
+  var txt=LT?'#7d7b87':'#6b6a75',bg=LT?'rgba(0,0,0,.05)':'rgba(255,255,255,.05)';
+  var h='<svg viewBox="0 0 '+W+' '+H+'" font-family="-apple-system,sans-serif">';
+  bars.forEach(function(b,i){
+    var x=L+i*bw+gap/2,w=bw-gap;
+    if(b.v==null||b.fut){h+='<rect x="'+x.toFixed(1)+'" y="'+(H-B-3)+'" width="'+w.toFixed(1)+'" height="3" rx="1.5" fill="'+bg+'"/>';}
+    else{var y=Y(b.v),hit=M.goal&&b.v>=M.goal;h+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(2,(H-B-y)).toFixed(1)+'" rx="'+Math.min(4,w/2).toFixed(1)+'" fill="'+M.c+'" opacity="'+(hit||b.today?1:.55)+'"/>';
+      if(n<=7)h+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(y-3).toFixed(1)+'" font-size="9.5" fill="'+txt+'" text-anchor="middle">'+(b.v>=10000?d1(b.v/1000)+'k':nf(b.v))+'</text>';}
+    if(b.l)h+='<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-6)+'" font-size="10" fill="'+(b.today?M.c:txt)+'" font-weight="'+(b.today?'800':'400')+'" text-anchor="middle">'+b.l+'</text>';
+  });
+  if(M.goal)h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(M.goal).toFixed(1)+'" y2="'+Y(M.goal).toFixed(1)+'" stroke="'+M.c+'" stroke-dasharray="4 4" opacity=".7"/>';
+  h+='</svg>';
+  $('chart').innerHTML=h;
+  var past=days.filter(function(x){return x.date<=today&&x[METRIC]!=null;});
+  var tot=past.reduce(function(a,x){return a+x[METRIC];},0),avg=past.length?tot/past.length:null;
+  var hit=M.goal?past.filter(function(x){return x[METRIC]>=M.goal;}).length:null;
+  var lbl=d.period==='week'?(WEEK_OFF===0?'cette semaine':WEEK_OFF===-1?'semaine dernière':'il y a '+(-WEEK_OFF)+' semaines'):d.period==='month'?'30 jours':'cette année';
+  $('ch-sum').innerHTML='<span>Moyenne <b>'+nf(avg)+'</b> '+M.u+'/j</span><span>Total <b>'+nf(tot)+'</b></span>'+(hit!=null?'<span>Objectif <b>'+hit+'/'+past.length+'</b> j</span>':'')+'<span style="width:100%;color:var(--t3)">'+fmtRange(d)+' · '+lbl+'</span>';
+}
+function fmtRange(d){var a=pd(d.from),b=pd(d.to);return a.getDate()+' '+MOIS[a.getMonth()]+' → '+b.getDate()+' '+MOIS[b.getMonth()];}
+
+function renderActs(d){
+  var list=[];
+  (d.days||[]).forEach(function(x){(x.sessions||[]).forEach(function(s){list.push(s);});});
+  list.sort(function(a,b){return b.start.localeCompare(a.start);});
+  $('act-n').textContent=list.length?list.length+' sur la période':'';
+  if(!list.length){$('acts').innerHTML='<div class="empty">Aucune séance enregistrée sur la période.<br>Lance une séance sur ta montre ou ton appli sport : elle apparaîtra ici.</div>';return;}
+  $('acts').innerHTML=list.slice(0,15).map(function(s){
+    var ic=s.label.split(' ')[0],nm=s.title||s.label.slice(ic.length+1),dt=new Date(s.start);
+    return '<div class="act"><div class="ic">'+ic+'</div><div class="nm">'+escH(nm)+'<small>'+JOURS_L[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]+' · '+hhmm(s.start)+' · '+s.min+' min</small></div>'
+      +(s.kcal!=null?'<div class="kc">'+nf(s.kcal)+' kcal</div>':'')+'</div>';
+  }).join('');
+}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+function renderSleep(d){
+  var S=(d.sleep||[]).filter(function(s){return s.min>=60;});
+  if(!S.length){$('sleep').innerHTML='<div class="empty">Aucune nuit enregistrée sur les 7 derniers jours.</div>';$('sl-d').textContent='';return;}
+  var l=S[S.length-1],asleep=l.min-(l.awake||0);
+  $('sl-d').textContent=ago(l.end);
+  var h='<div class="big">'+hm(asleep)+'<small>endormi · '+hhmm(l.start)+' → '+hhmm(l.end)+'</small></div>';
+  if(l.light!=null){
+    var tot=(l.light||0)+(l.deep||0)+(l.rem||0)+(l.awake||0)||1,P=function(v){return (v/tot*100).toFixed(1)+'%';};
+    h+='<div class="sleep-bar"><div style="width:'+P(l.deep)+';background:#3949AB"></div><div style="width:'+P(l.light)+';background:#7986CB"></div><div style="width:'+P(l.rem)+';background:#29B6F6"></div><div style="width:'+P(l.awake)+';background:#FF8A65"></div></div>'
+      +'<div class="leg"><span><i style="background:#3949AB"></i>Profond '+hm(l.deep)+'</span><span><i style="background:#7986CB"></i>Léger '+hm(l.light)+'</span><span><i style="background:#29B6F6"></i>Paradoxal '+hm(l.rem)+'</span><span><i style="background:#FF8A65"></i>Éveillé '+hm(l.awake)+'</span></div>';
+  }
+  var avg=S.reduce(function(a,s){return a+s.min-(s.awake||0);},0)/S.length;
+  h+='<div class="note">Moyenne sur '+S.length+' nuit'+(S.length>1?'s':'')+' : <b style="color:var(--t)">'+hm(avg)+'</b> · objectif '+hm(OBJ.sleep*60)+'</div>';
+  $('sleep').innerHTML=h;
+}
+
+/* ── Période / métrique ── */
+function setPeriod(p){PERIOD=p;WEEK_OFF=0;prefSet('sante_period',p);loadCache();refresh();}
+function weekNav(k){WEEK_OFF=Math.min(0,WEEK_OFF+k);loadCache();refresh();}
+function setMetric(m){METRIC=m;prefSet('sante_metric',m);if(DATA)renderChart(DATA);}
+function loadCache(){var c=cacheGet('sante_cache_'+(PERIOD==='week'?'week'+WEEK_OFF:PERIOD));if(c){DATA=c;render();}}
+
+/* ── Objectifs ── */
+function openObj(){$('o-steps').value=OBJ.steps;$('o-act').value=OBJ.active;$('o-sleep').value=OBJ.sleep;$('sh-obj').classList.add('show');}
+function closeObj(){$('sh-obj').classList.remove('show');}
+function saveObj(){
+  var s=parseInt($('o-steps').value,10),a=parseInt($('o-act').value,10),sl=parseFloat(String($('o-sleep').value).replace(',','.'));
+  if(!isNaN(s))OBJ.steps=Math.max(0,s);if(!isNaN(a))OBJ.active=Math.max(0,a);if(!isNaN(sl))OBJ.sleep=Math.max(0,Math.min(14,sl));
+  prefSet('sante_obj',JSON.stringify(OBJ));closeObj();if(DATA)render();
+}
+window.onBackKey=function(){if($('sh-obj').classList.contains('show')){closeObj();return true;}return false;};
+
+loadCache();
+refresh();
+</script>
+</body>
+</html>

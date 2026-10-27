@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1a2e">
+<title>Callisthénie</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#f0efec;overflow:hidden}
+:root{
+  --bg:#0f0f13;--white:#1a1a22;--txt:#f0efec;--txt2:#b0aeb8;--txt3:#6b6a75;--border:#2a2a35;
+}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg)}
+#header{background:#1a1a22;padding:14px 16px 12px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+#header .header-left{display:flex;flex-direction:column;gap:4px}
+#header h1{font-size:18px;font-weight:800;color:var(--txt);letter-spacing:-.5px;line-height:1.1}
+#header h1 span{color:#0055A4}
+#header .header-sub{display:flex;align-items:center;gap:6px}
+#header .h-dot{width:4px;height:4px;border-radius:50%;background:linear-gradient(135deg,#5C6BC0,#A29BFE)}
+#header .h-tag{font-size:11px;font-weight:600;color:var(--txt3)}
+#header .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+#header-time{font-size:20px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+#header-date{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+#tabs{display:flex;background:#1a1a22;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:0;padding:9px 4px;font-size:11px;font-weight:700;color:var(--txt3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;text-align:center;transition:color .2s;white-space:nowrap}
+.tab .tab-sub{display:block;font-size:9px;font-weight:500;margin-top:2px;color:var(--txt3)}
+.tab.active .tab-sub{color:inherit}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:70px}
+.session-header{padding:14px 16px;background:#1a1a22;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.session-badge{width:56px;height:56px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1.1}
+.session-badge .s-icon{font-size:20px}
+.session-badge .s-lbl{font-size:8px;color:#fff;opacity:.9;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;text-align:center;white-space:nowrap;width:100%;padding:0 4px}
+.session-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.session-meta{font-size:11px;color:var(--txt2)}
+.session-tours{font-size:13px;font-weight:800;margin-top:5px}
+.session-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:4px}
+.progress-wrap{padding:10px 16px;background:#1a1a22;border-bottom:1px solid var(--border)}
+.progress-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-lbl{font-size:12px;font-weight:600;color:var(--txt2)}
+.progress-pct{font-size:13px;font-weight:700}
+.progress-track{background:var(--border);border-radius:8px;height:7px;overflow:hidden}
+.progress-fill{height:7px;border-radius:8px;transition:width .5s}
+.round-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#1a1a22;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.round-lbl{font-size:12px;font-weight:700;color:var(--txt2)}
+.round-btn{width:36px;height:36px;border-radius:50%;border:2px solid;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none;transition:all .2s}
+.round-rest-btn{margin-left:auto;border:none;color:#fff;font-size:12px;font-weight:700;padding:8px 12px;border-radius:20px;cursor:pointer;-webkit-appearance:none}
+.warm-section{padding:12px 16px;background:#0d1f1a;border-bottom:1px solid #ddf2ec}
+.warm-title{font-size:11px;font-weight:700;color:#4ECDC4;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.warm-item{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(127,205,187,.2)}
+.warm-item:last-child{border:none}
+.warm-item-txt{flex:1;font-size:14px;color:var(--txt);font-weight:500}
+.warm-item-sub{font-size:11px;color:var(--txt3)}
+.warm-badge{color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.bloc-titre{margin:10px 0 6px;padding:10px 14px;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;border-radius:10px}
+.exo-list{padding:12px 12px 24px}
+.exo-card{background:#1a1a22;border:1.5px solid var(--border);border-radius:16px;margin-bottom:10px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.exo-card.open{box-shadow:0 4px 18px rgba(0,0,0,.1)}
+.exo-card.done{opacity:.55}
+.exo-card-header{display:flex;align-items:center;padding:13px 14px;gap:12px}
+.exo-num{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.exo-num.is-done{background:linear-gradient(135deg,#4ECDC4,#95E1D3)!important;color:#fff!important}
+.exo-info{flex:1;min-width:0}
+.exo-name{font-size:21px;font-weight:800;color:var(--txt);margin-bottom:6px;line-height:1.2}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:18px;font-weight:800;padding:4px 12px;border-radius:10px;line-height:1.2}
+.badge-kg{background:#FFD54F;color:#1a1a22}
+.exo-chevron{font-size:20px;color:var(--txt3);transition:transform .25s;line-height:1;flex-shrink:0}
+.exo-card.open .exo-chevron{transform:rotate(180deg)}
+.exo-detail{display:none;border-top:1px solid var(--border)}
+.exo-card.open .exo-detail{display:block}
+.exo-body{padding:13px 14px}
+.steps-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.step{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start}
+.step-num{width:24px;height:24px;min-width:24px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step-txt{font-size:15px;color:var(--txt2);line-height:1.55}
+.tip-box{background:#1f1a08;border-radius:10px;padding:10px 12px;margin:8px 0 4px;font-size:14px;color:#ffd93d;line-height:1.55;border-left:3px solid #ffd93d}
+.err-box{background:#1f0808;border-radius:10px;padding:10px 12px;margin:6px 0;font-size:14px;color:#FF6B6B;line-height:1.55;border-left:3px solid #FF6B6B}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btn-timer{margin-top:0;flex:1}
+.btn-timer{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:none;font-size:14px;font-weight:700;padding:12px 10px;border-radius:12px;cursor:pointer;-webkit-appearance:none}
+.btn-hold{background:linear-gradient(135deg,#7FCDBB,#4ECDC4);color:#fff}
+.btn-rest{background:rgba(255,255,255,.08);color:#b0aeb8;border:1.5px solid #3a3a45}
+.btn-done{display:flex;align-items:center;gap:8px;width:100%;background:#1a1a22;border:1.5px solid var(--border);color:var(--txt2);font-size:14px;font-weight:600;padding:11px 16px;border-radius:12px;cursor:pointer;margin-top:8px;-webkit-appearance:none;justify-content:center}
+.btn-done.is-done{border-color:#4ECDC4;color:#3db8b0;background:#f0fffe}
+.conseil{margin:0 12px 80px;border-radius:16px;padding:13px 14px;font-size:14px;line-height:1.75;border:1px solid}
+.conseil-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.repos-wrap{padding:16px}
+.repos-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;text-align:center}
+.repos-icon{font-size:36px;margin-bottom:8px}
+.repos-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.repos-txt{font-size:13px;color:var(--txt2);line-height:1.6}
+#timer-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.93);z-index:100;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(4px)}
+#timer-overlay.show{display:flex}
+#timer-label{font-size:14px;font-weight:700;color:#ffd93d;margin-bottom:12px;text-align:center;padding:0 24px}
+#timer-ring{position:relative;width:190px;height:190px;margin:8px 0}
+#timer-ring svg{width:190px;height:190px;transform:rotate(-90deg)}
+#timer-ring .ring-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:10}
+#timer-ring .ring-fg{fill:none;stroke:#5C6BC0;stroke-width:10;stroke-linecap:round;stroke-dasharray:534;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear}
+#timer-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:58px;font-weight:800;color:#fff;line-height:1}
+#timer-sec{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:24px;margin-top:4px}
+#btn-stop{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:15px;font-weight:600;padding:13px 36px;border-radius:16px;cursor:pointer;-webkit-appearance:none}
+
+#bottom-nav{display:flex;background:#1a1a22;border-top:1px solid #2a2a35;padding:3px 0;position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 2px;cursor:pointer;border:none;background:none;color:#6b6a75;font-size:9px;font-weight:600}
+.nav-btn.active{color:#5C6BC0}
+.nav-btn span{font-size:15px}
+.app-ver{font-size:10px;font-weight:600;color:#6b6a75;letter-spacing:.3px}
+
+/* v7.0 — Thème clair automatique (mode jour du téléphone) */
+@media (prefers-color-scheme: light){
+html,body{background:#f2f2f6;color:#1a1a22}
+:root{--bg:#f2f2f6;--white:#ffffff;--txt:#1a1a22;--txt2:#4f4d58;--txt3:#7d7b87;--border:#e2e2ea}
+#header{background:#ffffff}
+#tabs{background:#ffffff}
+.session-header{background:#ffffff}
+.progress-wrap{background:#ffffff}
+.round-bar{background:#ffffff}
+.warm-section{background:#e6f6f1;border-bottom:1px solid #cdeee4}
+.exo-card{background:#ffffff}
+.tip-box{background:#fff7dc;color:#8a6a00}
+.err-box{background:#ffecec;color:#c62828}
+.btn-rest{background:rgba(0,0,0,0.064);color:#4f4d58;border:1.5px solid #d0d0da}
+.btn-done{background:#ffffff}
+#bottom-nav{background:#ffffff;border-top:1px solid #e2e2ea}
+.nav-btn{color:#7d7b87}
+.app-ver{color:#7d7b87}
+[style*="rgba(255,255,255,.06)"]{background:rgba(0,0,0,.045)!important}
+.exo-card{box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.session-badge .s-icon{color:#fff}
+}
+.bloc-sous{font-size:12px;font-weight:600;color:var(--txt2);margin-top:4px;text-transform:none;letter-spacing:0}
+.bloc-auto{font-size:11px;font-weight:600;color:var(--txt3);margin-top:6px;text-transform:none;letter-spacing:0}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="header">
+  <div class="header-left">
+    <h1>Callisthénie</h1>
+    <div class="header-sub">
+      <div class="h-dot"></div>
+      <span class="h-tag">Programme de la semaine<span class="app-ver" data-pre=" · "></span></span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="header-time"></div>
+    <div id="header-date"></div>
+  </div>
+</div>
+<div id="tabs"></div>
+<div id="content"></div>
+</div>
+<div id="timer-overlay">
+  <div id="timer-label">Repos</div>
+  <div id="timer-ring">
+    <svg viewBox="0 0 190 190"><circle class="ring-bg" cx="95" cy="95" r="85"/><circle class="ring-fg" id="ring-fg" cx="95" cy="95" r="85"/></svg>
+    <div id="timer-num">0</div>
+  </div>
+  <div id="timer-sec">secondes</div>
+  <div style="display:flex;gap:12px;margin-bottom:16px;">
+    <button id="btn-minus5" onclick="adjustTimer(-5)" style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:18px;font-weight:700;padding:10px 18px;border-radius:14px;cursor:pointer;">−5s</button>
+    <button id="btn-plus5" onclick="adjustTimer(5)" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);color:#fff;font-size:18px;font-weight:700;padding:10px 18px;border-radius:14px;cursor:pointer;">+5s</button>
+  </div>
+  <button id="btn-stop" onclick="stopTimer()">Arreter</button>
+</div>
+<script src="seance.js"></script>
+<script>
+/* Séances par défaut — modifiables dans l'appli (⚙️ Paramétrer la séance) */
+var DEFAULTS=[
+/* ─── A — LUNDI : Dos & Gainage ─── */
+{id:'A',letter:'A',col:'A',day:'Lun',time:'',dur:'~25 min',
+ name:'Dos & Gainage',desc:'Chaîne postérieure + haltères — renforcement dos et gainage',
+ conseil:'3 tours complets, repos 90 s uniquement en fin de tour. Tempo lent sur les haltères (4-0-2) : la descente contrôlée dessine le dos.',
+ warmup:[
+  {n:'Rotations cervicales et épaules',d:'Lent, amplitude max',b:'2x10'},
+  {n:'Cat-Cow',d:'Synchronisé avec la respiration',b:'2x8'},
+  {n:'Rotations bras complets',d:'Avant puis arrière',b:'2x10'},
+ ],
+ exos:[
+  {name:'Rowing haltères penché',reps:'10 rép.',rest:0,hold:0,kg:'8 kg',
+   steps:['Penché en avant à 45°, dos plat et rigide, haltères en main bras tendus.','Tirer les coudes vers le plafond en serrant les omoplates — expirer.','Tenir 1 sec en haut, descendre lentement sur 4 sec (tempo 4-0-2).','Concentration sur la contraction du dos à chaque répétition.'],
+   tip:'💡 Dos plat, coude vers le plafond, tempo 4-0-2.',
+   erreur:'⚠ Ne pas arrondir le dos — il reste plat et rigide tout au long.'},
+  {name:'Superman haltères',reps:'10 rép.',rest:0,hold:0,kg:'1,5 kg',
+   steps:['Allongé ventre, haltères de 1,5 kg dans les mains, bras tendus devant.','Lever bras et jambes en contrôlant la montée — expirer.','Tenir 2 secondes en haut — contraction maximale.','Redescendre lentement sans relâcher complètement.'],
+   tip:'💡 Contrôle de la montée, tenir 2 sec en haut.',
+   erreur:'⚠ Membres tendus — ne pas plier les coudes ni donner d\'élan.'},
+  {name:'Planche frontale',reps:'60 sec',rest:0,hold:60,kg:'',
+   steps:['Avant-bras au sol, coudes sous les épaules.','Corps aligné tête-talon, nombril rentré.','Fessiers contractés, bassin neutre.','Respiration abdominale lente pendant toute la tenue.'],
+   tip:'💡 Bassin neutre, respiration abdominale.',
+   erreur:'⚠ Si le dos s\'affaisse : posez les genoux et finissez la tenue.'},
+  {name:'Bird-Dog pause longue',reps:'8 rép./côté',rest:0,hold:0,kg:'',
+   steps:['À 4 pattes, dos plat comme une table.','Tendre bras droit + jambe gauche à l\'horizontale.','Pause 3 secondes en extension — abdos et fessiers contractés.','Revenir lentement et alterner.'],
+   tip:'💡 Pause 3 sec en extension, dos plat.',
+   erreur:'⚠ Le bassin ne pivote pas — hanches parallèles au sol.'},
+  {name:'Curl biceps',reps:'12 rép.',rest:0,hold:0,kg:'8 kg',
+   steps:['Debout, haltères de 8 kg, paumes vers le haut.','Fléchir les coudes sur 2 secondes.','Tenir 1 sec en haut, descendre sur 4 secondes.','Coudes collés au corps — mouvement strict.'],
+   tip:'💡 Descente 4 sec, pas d\'élan.',
+   erreur:'⚠ Ne pas balancer le buste pour prendre de l\'élan.'},
+  {name:'Planche latérale',reps:'50 sec/côté',rest:0,hold:50,kg:'',
+   steps:['Sur le côté, appui sur l\'avant-bras, coude sous l\'épaule.','Lever les hanches — corps aligné tête-pied.','Tenir 50 secondes, hanche haute.','Alterner les côtés.'],
+   tip:'💡 Hanche haute, corps aligné.',
+   erreur:'⚠ Hanches qui s\'affaissent = obliques qui ne travaillent plus.'},
+ ]},
+
+/* ─── B — MARDI : Abdos & Obliques ─── */
+{id:'B',letter:'B',col:'B',day:'Mar',time:'',dur:'~20 min',
+ name:'Abdos & Obliques',desc:'Sangle abdominale + obliques — ventre plat et poignées d\'amour',
+ conseil:'3 tours, repos 90 s en fin de tour seulement. Tempo lent sur chaque exercice — c\'est la clé de la définition abdominale.',
+ warmup:[
+  {n:'Rotations buste debout',d:'Hanches fixes',b:'2x10'},
+  {n:'Cat-Cow',d:'Lent, respirez',b:'2x8'},
+  {n:'Rotations bras complets',d:'Activation épaules',b:'2x10'},
+ ],
+ exos:[
+  {name:'Relevés de jambes tempo lent',reps:'12 rép.',rest:0,hold:0,kg:'',
+   steps:['Allongé sur le dos, mains sous les fesses.','Jambes tendues à la verticale au départ.','Descendre les jambes en 4 secondes vers 30° du sol.','Remonter en expirant — lombaires plaquées en permanence.'],
+   tip:'💡 Lombaires plaquées au sol.',
+   erreur:'⚠ Le dos ne se cambre jamais — réduire l\'amplitude si besoin.'},
+  {name:'Crunchs tempo 3 sec',reps:'15 rép.',rest:0,hold:0,kg:'',
+   steps:['Allongé, genoux à 90°, mains derrière les oreilles.','Monter en expirant — seules les épaules décollent.','Pause 1 seconde en haut, contraction maximale.','Descendre sur 3 secondes — la tête ne touche pas le sol.'],
+   tip:'💡 Expirer en montant, pas de coup de nuque.',
+   erreur:'⚠ Ne pas tirer sur la nuque — coudes ouverts.'},
+  {name:'Crunchs obliques',reps:'15 rép./côté',rest:0,hold:0,kg:'',
+   steps:['Allongé, genoux fléchis, mains derrière les oreilles.','Décoller les épaules et amener le coude droit vers le genou gauche.','Rotation contrôlée du buste, expirer en montant.','Redescendre lentement, toute la série puis changer de côté.'],
+   tip:'💡 Coude vers genou opposé, rotation contrôlée.',
+   erreur:'⚠ C\'est le buste qui tourne — pas seulement le coude qui avance.'},
+  {name:'Pont fessier isométrique',reps:'40 sec',rest:0,hold:40,kg:'',
+   steps:['Allongé, genoux à 90°, pieds à plat largeur bassin.','Monter les hanches en contractant les fessiers.','Tenir la position haute 40 secondes.','Respiration lente et régulière pendant la tenue.'],
+   tip:'💡 Tenir la contraction, hanches hautes.',
+   erreur:'⚠ Le mouvement vient des fessiers, pas du bas du dos.'},
+  {name:'Planche frontale touches épaules',reps:'10 rép./côté',rest:0,hold:0,kg:'',
+   steps:['Position planche bras tendus, pieds écartés largeur bassin.','Lever la main droite et toucher l\'épaule gauche.','Reposer la main, puis main gauche vers épaule droite.','Alterner lentement, corps gainé.'],
+   tip:'💡 Hanches stables, pas de rotation.',
+   erreur:'⚠ Le bassin ne balance pas — écarter un peu plus les pieds si besoin.'},
+  {name:'Extension dorsale Cobra',reps:'12 rép.',rest:0,hold:0,kg:'',
+   steps:['Allongé ventre, mains au sol sous les épaules.','Monter lentement le buste en contractant les lombaires.','Tenir 2 secondes en haut, regard devant.','Redescendre lentement sur 3 secondes.'],
+   tip:'💡 Mains au sol, monter lentement.',
+   erreur:'⚠ Ne pas pousser fort avec les bras — ce sont les lombaires qui travaillent.'},
+ ]},
+
+/* ─── C — MERCREDI : Circuit Métabolique Haut du Corps ─── */
+{id:'C',letter:'C',col:'C',day:'Mer',time:'',dur:'~25 min',
+ name:'Circuit Métabolique Haut du Corps',desc:'Pecs, obliques, cardio — 3 tours enchaînés',
+ conseil:'Enchaîne les 6 exercices sans pause, repos 90 s en fin de tour. Rythme régulier du premier au dernier tour — pas de sprint au départ.',
+ warmup:[
+  {n:'Rotations épaules + buste',d:'Amplitude progressive',b:'2x10'},
+  {n:'Cat-Cow',d:'Activez la colonne',b:'2x8'},
+  {n:'Rotations bras complets',d:'Accélérez progressivement',b:'2x10'},
+ ],
+ exos:[
+  {name:'Pompes avec rotation',reps:'10 rép./côté',rest:0,hold:0,kg:'',
+   steps:['Position pompe, corps aligné.','Faire une pompe complète.','En haut, pivoter en planche latérale bras tendu (étoile), bras vers le plafond.','Revenir, nouvelle pompe, rotation de l\'autre côté.'],
+   tip:'💡 Pompe + rotation en planche étoile, bras vers le plafond.',
+   erreur:'⚠ Pieds qui pivotent avec le corps — hanches hautes pendant la rotation.'},
+  {name:'Pompes arquées mains écartées',reps:'12 rép.',rest:0,hold:0,kg:'',
+   steps:['Mains au sol nettement plus larges que les épaules.','Corps aligné tête-pieds, abdos gainés.','Descendre poitrine vers le sol, coudes vers l\'extérieur.','Pousser en expirant.'],
+   tip:'💡 Mains larges, coudes vers l\'extérieur, pecs externes.',
+   erreur:'⚠ Corps comme une planche — les hanches ne montent pas.'},
+  {name:'Commando planche',reps:'10 rép.',rest:0,hold:0,kg:'',
+   steps:['Planche sur les avant-bras.','Monter sur la main gauche puis sur la main droite (planche bras tendus).','Redescendre coude gauche puis coude droit.','Alterner le bras qui commence à chaque répétition.'],
+   tip:'💡 Coude G, coude D, main G, main D — dos plat.',
+   erreur:'⚠ Le bassin ne se balance pas — pieds écartés pour la stabilité.'},
+  {name:'Mountain climbers lents',reps:'30 sec',rest:0,hold:30,kg:'',
+   steps:['Position planche bras tendus, épaules au-dessus des mains.','Amener un genou vers la poitrine.','Revenir et alterner, rythme contrôlé.','Respiration régulière pendant 30 secondes.'],
+   tip:'💡 Genou vers poitrine, dos plat, rythme contrôlé.',
+   erreur:'⚠ Les fesses ne montent pas — corps aligné.'},
+  {name:'Écartés haltères au sol',reps:'12 rép.',rest:0,hold:0,kg:'8 kg',
+   steps:['Allongé au sol, haltères 8 kg, bras tendus au-dessus de la poitrine.','Ouvrir les bras en croix, coudes légèrement fléchis.','Descente contrôlée jusqu\'au sol, étirement des pectoraux.','Remonter en arc de cercle en expirant.'],
+   tip:'💡 Bras en croix, légère flexion coudes, descente contrôlée.',
+   erreur:'⚠ Ne pas verrouiller les coudes — légère flexion permanente.'},
+  {name:'Crunchs obliques',reps:'15 rép./côté',rest:0,hold:0,kg:'',
+   steps:['Allongé, genoux fléchis, mains derrière les oreilles.','Décoller les épaules et tourner vers le genou opposé.','Expirer en montant, contraction 1 sec.','Redescendre lentement, puis changer de côté.'],
+   tip:'💡 Rotation vers le genou opposé.',
+   erreur:'⚠ Ne pas tirer sur la nuque.'},
+ ]},
+
+/* ─── D — JEUDI : Haut du Corps ─── */
+{id:'D',letter:'D',col:'D',day:'Jeu',time:'',dur:'~25 min',
+ name:'Haut du Corps',desc:'Épaules, bras, poitrine — haltères et poids de corps',
+ conseil:'3 tours, repos 90 s en fin de tour. Tempo lent sur les haltères. Note ton nombre de pompes négatives : c\'est ton baromètre de progression.',
+ warmup:[
+  {n:'Rotations épaules + poignets',d:'Amplitude complète',b:'2x10'},
+  {n:'Cat-Cow',d:'Mobilité colonne',b:'2x8'},
+  {n:'Rotations bras complets',d:'Avant puis arrière',b:'2x10'},
+ ],
+ exos:[
+  {name:'Développé épaules',reps:'12 rép.',rest:0,hold:0,kg:'5 kg',
+   steps:['Assis ou debout, haltères à hauteur des épaules, coudes à 90°.','Pousser vers le haut en expirant jusqu\'à bras presque tendus.','Redescendre lentement jusqu\'aux coudes à 90°.','Amplitude complète à chaque répétition.'],
+   tip:'💡 Coudes à 90° en bas, amplitude complète.',
+   erreur:'⚠ Ne pas cambrer le dos — buste droit tout au long.'},
+  {name:'Élévations latérales',reps:'12 rép.',rest:0,hold:0,kg:'3 kg',
+   steps:['Debout, haltères de 3 kg le long du corps, coudes légèrement fléchis.','Lever les bras sur les côtés jusqu\'à l\'horizontale.','Tenir 1 sec, redescendre lentement.','Aucun balancement du buste.'],
+   tip:'💡 Pas de balancement, monter jusqu\'à l\'horizontale.',
+   erreur:'⚠ Ne pas monter au-dessus des épaules — risque de tendinite.'},
+  {name:'Pompes négatives',reps:'8 rép.',rest:0,hold:0,kg:'',
+   steps:['Position planche bras tendus, corps aligné.','Descendre lentement sur 4 secondes jusqu\'au sol.','Remonter en un mouvement.','Corps gainé tout au long.'],
+   tip:'💡 Descente 4 sec, remonter en un mouvement.',
+   erreur:'⚠ Contrôle total jusqu\'au sol — ne pas s\'effondrer.'},
+  {name:'Extension triceps',reps:'10 rép.',rest:0,hold:0,kg:'8 kg',
+   steps:['Debout, un haltère de 8 kg à deux mains derrière la tête.','Coudes pointés vers le plafond.','Étendre les bras vers le haut en expirant.','Redescendre sur 4 sec (tempo 4-0-2) — coudes fixes.'],
+   tip:'💡 Coude fixe, tempo 4-0-2.',
+   erreur:'⚠ Les coudes ne s\'écartent pas vers les côtés.'},
+  {name:'Curl biceps',reps:'12 rép.',rest:0,hold:0,kg:'8 kg',
+   steps:['Debout, haltères de 8 kg, paumes vers le haut.','Fléchir les coudes sur 2 secondes.','Descendre sur 4 secondes.','Coudes collés au corps — mouvement strict.'],
+   tip:'💡 Descente 4 sec, coudes collés au corps.',
+   erreur:'⚠ Ne pas balancer le buste.'},
+  {name:'Pompes déclinées pieds sur chaise',reps:'12 rép.',rest:0,hold:0,kg:'',
+   steps:['Mains au sol, pieds posés sur la chaise.','Corps aligné, abdos gainés.','Descendre la poitrine vers le sol de façon contrôlée.','Pousser en expirant — cible les pectoraux hauts.'],
+   tip:'💡 Hanches alignées, descente contrôlée.',
+   erreur:'⚠ Les hanches ne montent pas — corps gainé.'},
+ ]},
+
+/* ─── E — VENDREDI : Circuit Haut du Corps ─── */
+{id:'E',letter:'E',col:'E',day:'Ven',time:'',dur:'~20 min',
+ name:'Circuit Haut du Corps',desc:'Épaules, dos, obliques — circuit varié vendredi',
+ conseil:'3 tours enchaînés, repos 90 s en fin de tour. Les pompes négatives en dernier : le baromètre de ta progression.',
+ warmup:[
+  {n:'Rotations épaules + buste',d:'Amplitude progressive',b:'2x10'},
+  {n:'Cat-Cow',d:'Activez la colonne',b:'2x8'},
+  {n:'Rotations bras complets',d:'Accélérez progressivement',b:'2x10'},
+ ],
+ exos:[
+  {name:'Développé épaules cardio',reps:'2 min',rest:0,hold:120,kg:'1,5 kg',
+   steps:['Debout, haltères de 1,5 kg à hauteur des épaules.','Pousser vers le haut alternativement gauche/droite.','Rythme soutenu, amplitude complète.','2 minutes, respiration régulière.'],
+   tip:'💡 Rythme soutenu, amplitude complète.',
+   erreur:'⚠ Buste droit — ne pas cambrer le dos.'},
+  {name:'Rowing assis haltères',reps:'45 sec',rest:0,hold:45,kg:'3 kg',
+   steps:['Assis sur le tapis, jambes tendues, haltères de 3 kg.','Dos droit, bras tendus devant.','Tirer les coudes vers l\'arrière en serrant les omoplates.','Rythme continu pendant 45 secondes.'],
+   tip:'💡 Dos droit, coudes vers l\'arrière.',
+   erreur:'⚠ Ne pas s\'affaisser — buste grand.'},
+  {name:'Planche latérale dynamique',reps:'50 sec/côté',rest:0,hold:50,kg:'',
+   steps:['Planche latérale sur l\'avant-bras, corps aligné.','Descendre la hanche vers le sol sans le toucher.','Remonter la hanche au-dessus de l\'alignement.','Rythme régulier 50 sec, puis l\'autre côté.'],
+   tip:'💡 Hanche monte et descend sans toucher le sol.',
+   erreur:'⚠ Le corps reste de profil — ne pas basculer vers l\'avant.'},
+  {name:'Crunchs obliques',reps:'15 rép./côté',rest:0,hold:0,kg:'',
+   steps:['Allongé, genoux fléchis, mains derrière les oreilles.','Décoller les épaules et tourner vers le genou opposé.','Expirer en montant, contraction 1 sec.','Redescendre lentement, puis changer de côté.'],
+   tip:'💡 Rotation vers le genou opposé.',
+   erreur:'⚠ Ne pas tirer sur la nuque.'},
+  {name:'Pompes diamant',reps:'10 rép.',rest:0,hold:0,kg:'',
+   steps:['Mains jointes en triangle sous la poitrine (pouces et index se touchent).','Corps aligné, abdos gainés.','Descendre la poitrine vers les mains, coudes le long du corps.','Pousser en expirant.'],
+   tip:'💡 Mains en triangle sous la poitrine, triceps + pecs internes.',
+   erreur:'⚠ Trop dur ? Faire la version genoux au sol plutôt que casser l\'alignement.'},
+  {name:'Pompes négatives',reps:'8 rép.',rest:0,hold:0,kg:'',
+   steps:['Position planche bras tendus, corps aligné.','Descendre lentement sur 4 à 6 secondes jusqu\'au sol.','Remonter normalement.','Corps gainé tout au long.'],
+   tip:'💡 Le baromètre de ta progression.',
+   erreur:'⚠ Contrôle total jusqu\'au sol — ne pas s\'effondrer.'},
+ ]},
+
+/* ─── F — SAMEDI : Full Body + Mobilité ─── */
+{id:'F',letter:'F',col:'F',day:'Sam',time:'',dur:'~35 min',
+ name:'Full Body + Mobilité',desc:'Bloc Force puis Bloc Étirements — séance complète à tête reposée',
+ conseil:'Bloc Force en 3 tours avec repos 90 s en fin de tour, puis les étirements en un seul passage, dans l\'ordre.',
+ warmup:[
+  {n:'Rotations articulaires complètes',d:'Nuque → chevilles',b:'1 tour'},
+  {n:'Cat-Cow',d:'Réveil de la colonne',b:'2x8'},
+  {n:'Rotations bras + buste',d:'Grands cercles, amplitude progressive',b:'2x10'},
+ ],
+ blocs:[
+  {
+   titre:'Bloc Force',
+   type:'rounds',maxRounds:3,restSec:90,
+   exos:[
+    {name:'Rowing haltères penché',reps:'10 rép.',rest:0,hold:0,kg:'8 kg',
+     steps:['Penché à 45°, dos plat, haltères bras tendus.','Tirer les coudes vers l\'arrière, omoplates serrées.','Tenir 1 sec, descendre sur 4 sec.','Tirage puissant, descente contrôlée.'],
+     tip:'💡 Dos plat, tirage puissant.',
+     erreur:'⚠ Dos plat et rigide — jamais arrondi.'},
+    {name:'Développé épaules',reps:'12 rép.',rest:0,hold:0,kg:'5 kg',
+     steps:['Assis, haltères à hauteur des épaules.','Pousser vers le haut en expirant.','Redescendre lentement, coudes à 90°.','Amplitude complète à chaque répétition.'],
+     tip:'💡 Amplitude complète.',
+     erreur:'⚠ Dos droit — ne pas cambrer.'},
+    {name:'Pompes complètes au sol',reps:'10 rép.',rest:0,hold:0,kg:'',
+     steps:['Mains au sol largeur épaules, corps aligné.','Descendre jusqu\'au sol, coudes à 45°.','Pousser en expirant.','Abdos et fessiers gainés tout au long.'],
+     tip:'💡 Corps aligné, descente jusqu\'au sol.',
+     erreur:'⚠ Corps comme une planche — pas de hanches qui tombent.'},
+    {name:'Extension triceps',reps:'10 rép.',rest:0,hold:0,kg:'8 kg',
+     steps:['Un haltère de 8 kg à deux mains derrière la tête.','Coudes pointés vers le plafond.','Étendre les bras vers le haut en expirant.','Redescendre sur 4 sec (tempo 4-0-2) — coudes fixes.'],
+     tip:'💡 Coude fixe, tempo 4-0-2.',
+     erreur:'⚠ Les coudes ne s\'écartent pas.'},
+    {name:'Écartés haltères au sol',reps:'12 rép.',rest:0,hold:0,kg:'8 kg',
+     steps:['Allongé au sol, haltères 8 kg, bras tendus au-dessus de la poitrine.','Ouvrir les bras au maximum, coudes légèrement fléchis.','Sentir l\'étirement des pectoraux en bas.','Remonter lentement en expirant.'],
+     tip:'💡 Ouverture maximale, légère flexion coudes.',
+     erreur:'⚠ Ne pas verrouiller les coudes.'},
+    {name:'Planche latérale dynamique',reps:'30 sec/côté',rest:0,hold:30,kg:'',
+     steps:['Planche latérale sur l\'avant-bras, corps aligné.','Descendre la hanche vers le sol sans le toucher.','Remonter la hanche au-dessus de l\'alignement.','30 sec puis l\'autre côté.'],
+     tip:'💡 Hanche monte et descend.',
+     erreur:'⚠ Le corps reste de profil.'},
+   ]
+  },
+  {
+   titre:'Bloc Étirements',
+   type:'linear',
+   exos:[
+    {name:'Pigeon',reps:'60 sec/côté',rest:0,hold:60,kg:'',
+     steps:['Jambe avant fléchie à 90°, jambe arrière tendue.','Hanches vers le sol, avant-bras au sol pour s\'abaisser.','Relâcher le poids du corps.','60 secondes par côté, respiration profonde.'],
+     tip:'💡 Hanches au sol, respiration profonde.',
+     erreur:'⚠ Ne forcez pas — respirez dans la position.'},
+    {name:'Torsion spinale',reps:'45 sec/côté',rest:0,hold:45,kg:'',
+     steps:['Allongé sur le dos, bras en croix.','Ramener le genou droit de l\'autre côté, guidé par la main.','Épaules au sol — regard du côté opposé.','45 sec puis alterner.'],
+     tip:'💡 Épaules au sol, genou guidé par la main.',
+     erreur:'⚠ La gravité suffit — ne forcez pas.'},
+    {name:'Posture de l\'enfant',reps:'90 sec',rest:0,hold:90,kg:'',
+     steps:['À genoux, bras tendus devant, front au sol.','Relâcher complètement le dos.','Chaque expiration allonge la colonne.','90 secondes.'],
+     tip:'💡 Bras tendus, front au sol.',
+     erreur:'⚠ Serviette sous les fesses si les genoux font mal.'},
+   ]
+  }
+ ],
+ exos:[]},
+
+/* ─── G — DIMANCHE : Gainage & Récupération ─── */
+{id:'G',letter:'🌿',col:'REC',day:'Dim',time:'',dur:'~40 min',
+ name:'Gainage & Récupération',desc:'Bloc Gainage puis Repos actif — préparer la semaine suivante',
+ conseil:'Bloc Gainage en 3 tours (repos 60 s en fin de tour), puis le bloc Récupération en un seul passage, sans impact.',
+ warmup:[],
+ blocs:[
+  {
+   titre:'Bloc Gainage',
+   type:'rounds',maxRounds:3,restSec:60,
+   exos:[
+    {name:'Planche frontale',reps:'60 sec',rest:0,hold:60,kg:'',
+     steps:['Avant-bras au sol, corps aligné tête-talon.','Nombril rentré, fessiers contractés.','Tenir en respirant lentement.','60 secondes.'],
+     tip:'💡 Objectif : tenir sans trembler.',
+     erreur:'⚠ Genoux au sol si le dos s\'affaisse.'},
+    {name:'Planche latérale',reps:'50 sec/côté',rest:0,hold:50,kg:'',
+     steps:['Sur le côté, avant-bras au sol, hanches levées.','Corps aligné tête-pied.','Tenir 50 sec, hanche haute.','Alterner les côtés.'],
+     tip:'💡 Hanche haute tout au long.',
+     erreur:'⚠ Hanches qui s\'affaissent = obliques inactifs.'},
+    {name:'Dead Bug 4 sec',reps:'6 rép./côté',rest:0,hold:0,kg:'',
+     steps:['Allongé, dos plaqué au sol.','Bras au plafond, genoux à 90°.','Descendre bras droit + jambe gauche sur 4 secondes.','Revenir et alterner.'],
+     tip:'💡 Qualité sur quantité.',
+     erreur:'⚠ Le dos ne décolle pas du sol.'},
+    {name:'Vacuum abdominal',reps:'20 sec',rest:0,hold:20,kg:'',
+     steps:['Expirer à fond.','Rentrer le nombril vers la colonne au maximum.','Tenir 20 sec.','Respiration thoracique courte pendant la tenue.'],
+     tip:'💡 Nombril vers la colonne, respiration thoracique.',
+     erreur:'⚠ C\'est une rétraction vers l\'intérieur, pas vers le haut.'},
+   ]
+  },
+  {
+   titre:'Bloc Récupération',
+   type:'linear',
+   exos:[
+    {name:'Marche extérieure douce',reps:'20 min',rest:0,hold:1200,kg:'',
+     steps:['Allure tranquille, pas de performance.','La lumière naturelle du matin régule le sommeil.','Respiration libre, épaules relâchées.','20 minutes minimum.'],
+     tip:'💡 Allure tranquille, bénéfice mental et physique.',
+     erreur:''},
+    {name:'Abduction hanche allongée',reps:'12 rép./côté',rest:0,hold:0,kg:'',
+     steps:['Allongé sur le côté, corps aligné.','Lever la jambe tendue, pied en flexion, amplitude maximale.','Tenir 1 sec, redescendre lentement.','Toute la série d\'un côté puis alterner.'],
+     tip:'💡 Amplitude maximale, mouvement lent.',
+     erreur:'⚠ Hanches empilées — le bassin ne bascule pas.'},
+    {name:'Clamshell',reps:'12 rép./côté',rest:0,hold:0,kg:'',
+     steps:['Allongé sur le côté, genoux fléchis à 90°, pieds joints.','Ouvrir le genou du dessus vers le plafond (rotation externe de hanche).','Tenir 1 sec, redescendre lentement.','Toute la série d\'un côté puis alterner.'],
+     tip:'💡 Pieds joints, rotation externe de hanche.',
+     erreur:'⚠ Le bassin ne roule pas vers l\'arrière.'},
+    {name:'Pont fessier unilatéral',reps:'10 rép./côté',rest:0,hold:0,kg:'',
+     steps:['Allongé, un genou fléchi pied à plat, l\'autre jambe tendue.','Pousser sur le talon pour lever les hanches.','Tenir 2 sec en haut, hanches hautes et de niveau.','Toute la série d\'un côté puis alterner.'],
+     tip:'💡 Poussée sur le talon, hanches hautes.',
+     erreur:'⚠ Le bassin ne penche pas d\'un côté.'},
+    {name:'Torsion spinale',reps:'45 sec/côté',rest:0,hold:45,kg:'',
+     steps:['Allongé sur le dos, bras en croix.','Genou ramené de l\'autre côté.','Épaules au sol — 45 sec puis alterner.','Respiration profonde.'],
+     tip:'💡 Décompression lombaire.',
+     erreur:'⚠ La gravité suffit.'},
+    {name:'Posture de l\'enfant',reps:'90 sec',rest:0,hold:90,kg:'',
+     steps:['À genoux, bras tendus devant, front au sol.','Relâcher complètement le poids du corps.','Chaque expiration allonge la colonne.','90 secondes.'],
+     tip:'💡 Relâchement complet.',
+     erreur:'⚠ Serviette sous les fesses si les genoux font mal.'},
+    {name:'Étirement hip flexors',reps:'45 sec/côté',rest:0,hold:45,kg:'',
+     steps:['En fente basse, genou arrière au sol.','Basculer le bassin vers l\'avant, fessier arrière contracté.','Sentir l\'étirement à l\'avant de la hanche arrière.','45 sec puis changer de côté.'],
+     tip:'💡 Bassin basculé vers l\'avant.',
+     erreur:'⚠ Ne pas cambrer le bas du dos — c\'est le bassin qui bascule.'},
+   ]
+  }
+ ],
+ exos:[]},
+
+];
+
+PAGE={
+  key:'programme',
+  widget:true,
+  today:true,
+  days:[
+    {tab:'Lun'},{tab:'Mar'},{tab:'Mer'},{tab:'Jeu'},{tab:'Ven'},{tab:'Sam'},{tab:'Dim'}
+  ],
+  defaults:DEFAULTS
+};
+initSeances();
+</script>
+
+<div id="bottom-nav">
+  <button class="nav-btn active" onclick="navTo('programme')"><span>🏋️</span>Programme</button>
+  <button class="nav-btn" onclick="navTo('respiration')"><span>🫁</span>Respiration</button>
+  <button class="nav-btn" onclick="navTo('poids')"><span>⚖️</span>Poids</button>
+  <button class="nav-btn" onclick="navTo('extra')"><span>💪</span>Extra</button>
+  <button class="nav-btn" onclick="navTo('sante')"><span>📊</span>Santé</button>
+</div>
+</body>
+</html>

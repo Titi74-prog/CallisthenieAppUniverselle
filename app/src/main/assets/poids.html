@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Poids</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0f0f13;--card:#1a1a22;--in:#0f0f13;--t:#f0efec;--t2:#b0aeb8;--t3:#6b6a75;--bd:#2a2a35;--acc:#5C6BC0;--ok:#4ECDC4;--warn:#F9A825;--bad:#EF5350}
+@media (prefers-color-scheme: light){:root{--bg:#f2f2f6;--card:#ffffff;--in:#f2f2f6;--t:#1a1a22;--t2:#4f4d58;--t3:#7d7b87;--bd:#e2e2ea}}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto}
+#header{background:var(--card);padding:14px 16px 12px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#header h1{font-size:18px;font-weight:800}
+.h-sub{font-size:11px;color:var(--t3);font-weight:600;margin-top:2px}
+#header-time{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+#content{flex:1;overflow-y:auto;padding:12px 12px 90px;-webkit-overflow-scrolling:touch}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-title b{font-weight:700;color:var(--t3);text-transform:none;letter-spacing:0}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.st{background:var(--in);border-radius:12px;padding:10px 12px}
+.st-l{font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.st-v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.st-v small{font-size:13px;font-weight:600;color:var(--t2);margin-left:2px}
+.st-s{font-size:11.5px;color:var(--t2);margin-top:2px}
+.prog{margin-top:12px}
+.prog-track{height:8px;border-radius:8px;background:var(--bd);overflow:hidden}
+.prog-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#5C6BC0,#4ECDC4);width:0}
+.prog-l{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:5px;font-weight:600}
+.btns{display:flex;gap:8px;margin-bottom:12px}
+.btn{flex:1;border:none;border-radius:12px;padding:12px 8px;font-size:13.5px;font-weight:800;cursor:pointer;-webkit-appearance:none}
+.btn-main{background:linear-gradient(135deg,#5C6BC0,#7986CB);color:#fff}
+.btn-sec{background:var(--card);color:var(--t2);border:1px solid var(--bd)}
+.rng{display:flex;gap:6px}
+.rng button{border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:8px;cursor:pointer}
+.rng button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+#chart{width:100%;height:auto;display:block}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--t3);margin-top:6px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.empty{font-size:13.5px;color:var(--t2);line-height:1.55;text-align:center;padding:22px 8px}
+.row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--bd)}
+.row:last-child{border:none}
+.row .d{flex:1;font-size:14px;color:var(--t2)}
+.row .v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.row .dl{font-size:12px;font-weight:700;width:58px;text-align:right;font-variant-numeric:tabular-nums}
+.row button{background:none;border:none;color:var(--t3);font-size:16px;padding:2px 6px;cursor:pointer}
+.more{width:100%;background:transparent;border:none;color:var(--acc);font-size:13px;font-weight:700;padding:8px;cursor:pointer}
+.toast{display:none;margin:-4px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(78,205,196,.12);border:1px solid rgba(78,205,196,.45);color:var(--ok);font-size:12.5px;font-weight:700;line-height:1.45}
+/* Feuilles (saisie, objectif) */
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:18px 16px 20px}
+.sheet h2{font-size:17px;font-weight:800;margin-bottom:14px}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.f input{width:100%;background:var(--in);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:17px;font-weight:700;padding:10px 12px;font-family:inherit;-webkit-appearance:none}
+.f input:focus{outline:none;border-color:var(--acc)}
+.f .hint{font-size:11.5px;color:var(--t3);margin-top:4px}
+.frow{display:flex;gap:10px}.frow .f{flex:1;min-width:0}
+.sheet .btns{margin:6px 0 0}
+.danger{background:transparent;color:var(--bad);border:1px solid rgba(239,83,80,.4)}
+#bottom-nav{display:flex;background:var(--card);border-top:1px solid var(--bd);padding:3px 0;position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 2px;cursor:pointer;border:none;background:none;color:var(--t3);font-size:9px;font-weight:600}
+.nav-btn.active{color:#FFB74D}
+.nav-btn span{font-size:15px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div><h1>Poids</h1><div class="h-sub">Suivi et objectif<span class="app-ver" data-pre=" · "></span></div></div>
+    <div id="header-time"></div>
+  </div>
+  <div id="content">
+    <div class="card">
+      <div class="card-title">⚖️ Progression <b id="obj-date"></b></div>
+      <div class="stats">
+        <div class="st"><div class="st-l">Actuel</div><div class="st-v" id="s-cur">—</div><div class="st-s" id="s-cur-s"></div></div>
+        <div class="st"><div class="st-l">Objectif</div><div class="st-v" id="s-obj">—</div><div class="st-s" id="s-obj-s">Touche 🎯 pour le définir</div></div>
+        <div class="st"><div class="st-l">Depuis le début</div><div class="st-v" id="s-tot">—</div><div class="st-s" id="s-tot-s"></div></div>
+        <div class="st"><div class="st-l">IMC</div><div class="st-v" id="s-imc">—</div><div class="st-s" id="s-imc-s">Taille à saisir via 🎯</div></div>
+      </div>
+      <div class="prog" id="prog" style="display:none">
+        <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+        <div class="prog-l"><span id="prog-a"></span><span id="prog-p"></span><span id="prog-b"></span></div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-main" onclick="openAdd()">＋ Pesée</button>
+      <button class="btn btn-sec" onclick="importHC()">⤓ Health Connect</button>
+      <button class="btn btn-sec" onclick="openObj()">🎯 Objectif</button>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <div class="card">
+      <div class="card-title">📈 Courbe
+        <div class="rng" id="rng">
+          <button data-r="30" onclick="setRange(30)">1 M</button><button data-r="90" onclick="setRange(90)">3 M</button><button data-r="180" onclick="setRange(180)">6 M</button><button data-r="0" onclick="setRange(0)">Tout</button>
+        </div>
+      </div>
+      <div id="chart-wrap"></div>
+      <div class="leg" id="leg"><span><i style="background:#5C6BC0"></i>Pesées</span><span><i style="background:#FFB74D"></i>Moyenne 7 j</span><span><i style="background:#4ECDC4"></i>Objectif</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Pesées <b id="n-pes"></b></div>
+      <div id="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Ajout d'une pesée -->
+<div class="sheet-bg" id="sh-add" onclick="if(event.target===this)closeSheets()">
+  <div class="sheet">
+    <h2>＋ Nouvelle pesée</h2>
+    <div class="frow">
+      <div class="f"><label>Date</label><input type="date" id="in-date"></div>
+      <div class="f"><label>Poids (kg)</label><input type="number" id="in-kg" inputmode="decimal" step="0.1" min="20" max="300" placeholder="ex. 72,5"></div>
+    </div>
+    <div class="btns"><button class="btn btn-sec" onclick="closeSheets()">Annuler</button><button class="btn btn-main" onclick="saveAdd()">✓ Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Objectif -->
+<div class="sheet-bg" id="sh-obj" onclick="if(event.target===this)closeSheets()">
+  <div class="sheet">
+    <h2>🎯 Objectif</h2>
+    <div class="frow">
+      <div class="f"><label>Poids visé (kg)</label><input type="number" id="in-obj" inputmode="decimal" step="0.5" min="20" max="300" placeholder="ex. 70"></div>
+      <div class="f"><label>Date visée</label><input type="date" id="in-objd"></div>
+    </div>
+    <div class="f"><label>Taille (cm)</label><input type="number" id="in-taille" inputmode="numeric" step="1" min="100" max="250" placeholder="ex. 175"><div class="hint">Sert uniquement au calcul de l'IMC.</div></div>
+    <div class="btns"><button class="btn btn-sec" onclick="closeSheets()">Annuler</button><button class="btn btn-main" onclick="saveObj()">✓ Enregistrer</button></div>
+    <div class="btns" style="margin-top:14px"><button class="btn danger" onclick="clearAll()">🗑 Effacer toutes les pesées</button></div>
+  </div>
+</div>
+
+<div id="bottom-nav">
+  <button class="nav-btn" onclick="navTo('programme')"><span>🏋️</span>Programme</button>
+  <button class="nav-btn" onclick="navTo('respiration')"><span>🫁</span>Respiration</button>
+  <button class="nav-btn active" onclick="navTo('poids')"><span>⚖️</span>Poids</button>
+  <button class="nav-btn" onclick="navTo('extra')"><span>💪</span>Extra</button>
+  <button class="nav-btn" onclick="navTo('sante')"><span>📊</span>Santé</button>
+</div>
+
+<script>
+var LT=false;try{LT=window.matchMedia('(prefers-color-scheme: light)').matches;}catch(e){}
+function $(id){return document.getElementById(id);}
+function navTo(p){var m={programme:'programme.html',respiration:'respiration.html',poids:'poids.html',extra:'seance_extra.html',sante:'sante.html'};if(m[p])location.href='file:///android_asset/'+m[p];}
+function updateClock(){var n=new Date();$('header-time').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+updateClock();setInterval(updateClock,10000);
+try{var v=window.App&&App.version();if(v)document.querySelectorAll('.app-ver').forEach(function(e){e.textContent=e.getAttribute('data-pre')+'v'+v;});}catch(e){}
+
+/* ── Stockage : préférences Android (conservées lors des mises à jour) + copie navigateur ── */
+function prefGet(k){var v=null;try{if(window.App&&App.getPref)v=App.getPref(k);}catch(e){}if(v==null){try{v=localStorage.getItem(k);}catch(e){}}return v;}
+function prefSet(k,v){try{if(window.App&&App.setPref)App.setPref(k,v);}catch(e){}try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
+function jGet(k,def){try{var v=JSON.parse(prefGet(k));return v==null?def:v;}catch(e){return def;}}
+
+var PES=jGet('pesees',[]);       // [{date:'AAAA-MM-JJ', kg:72.5, src:'hc'|'m'}]
+var CFG=jGet('poids_cfg',{});    // {objectif, date, taille}
+var RANGE=+(prefGet('poids_range')||90);
+function savePes(){PES.sort(function(a,b){return a.date.localeCompare(b.date);});prefSet('pesees',JSON.stringify(PES));}
+function saveCfg(){prefSet('poids_cfg',JSON.stringify(CFG));}
+
+/* ── Formats ── */
+function ld(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function pd(s){return new Date(s+'T12:00:00');}
+function kg(v,dec){return v==null||isNaN(v)?'—':v.toFixed(dec==null?1:dec).replace('.',',');}
+function fd(s){var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}
+var MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function fdl(s){var d=pd(s);return d.getDate()+' '+MOIS[d.getMonth()]+' '+d.getFullYear();}
+function days(a,b){return Math.round((pd(b)-pd(a))/864e5);}
+
+/* ── Rendu ── */
+function render(){
+  PES.sort(function(a,b){return a.date.localeCompare(b.date);});
+  var n=PES.length,last=n?PES[n-1]:null,first=n?PES[0]:null,obj=+CFG.objectif||null;
+  $('s-cur').innerHTML=last?kg(last.kg)+'<small>kg</small>':'—';
+  $('s-cur-s').textContent=last?fdl(last.date):'Aucune pesée';
+  $('s-obj').innerHTML=obj?kg(obj)+'<small>kg</small>':'—';
+  if(obj&&last){var r=last.kg-obj;$('s-obj-s').textContent=Math.abs(r)<0.05?'Objectif atteint 🎉':(r>0?'encore '+kg(r)+' kg à perdre':'encore '+kg(-r)+' kg à prendre');}
+  else $('s-obj-s').textContent='Touche 🎯 pour le définir';
+  $('obj-date').textContent=CFG.date?'visée : '+fdl(CFG.date):'';
+  if(n>1){var dt=last.kg-first.kg;$('s-tot').innerHTML=(dt>0?'+':dt<0?'−':'')+kg(Math.abs(dt))+'<small>kg</small>';
+    $('s-tot').style.color=obj?((obj<first.kg?dt<0:dt>0)?'var(--ok)':'var(--bad)'):'';
+    $('s-tot-s').textContent='depuis le '+fd(first.date)+' · '+days(first.date,last.date)+' j';}
+  else{$('s-tot').textContent='—';$('s-tot').style.color='';$('s-tot-s').textContent='';}
+  var t=+CFG.taille||0;
+  if(t&&last){var imc=last.kg/Math.pow(t/100,2);$('s-imc').textContent=kg(imc);
+    $('s-imc-s').textContent=imc<18.5?'insuffisance pondérale':imc<25?'corpulence normale':imc<30?'surpoids':'obésité';}
+  else{$('s-imc').textContent='—';$('s-imc-s').textContent='Taille à saisir via 🎯';}
+  /* Barre de progression départ → objectif */
+  if(obj&&n&&first.kg!==obj){
+    var p=Math.max(0,Math.min(1,(first.kg-last.kg)/(first.kg-obj)));
+    $('prog').style.display='block';$('prog-fill').style.width=(p*100).toFixed(0)+'%';
+    $('prog-a').textContent=kg(first.kg)+' kg';$('prog-b').textContent=kg(obj)+' kg';$('prog-p').textContent=Math.round(p*100)+' %';
+  }else $('prog').style.display='none';
+  renderChart();renderList();
+}
+
+function avg7(arr,i){var d=pd(arr[i].date),s=0,c=0;for(var k=i;k>=0;k--){if((d-pd(arr[k].date))/864e5>6)break;s+=arr[k].kg;c++;}return s/c;}
+
+function renderChart(){
+  document.querySelectorAll('#rng button').forEach(function(b){b.classList.toggle('on',+b.getAttribute('data-r')===RANGE);});
+  var wrap=$('chart-wrap');
+  if(!PES.length){wrap.innerHTML='<div class="empty">La courbe est vide.<br>Ajoute une pesée avec <b>＋ Pesée</b> ou importe tes pesées depuis <b>Health Connect</b> (balance connectée, montre…).</div>';$('leg').style.display='none';return;}
+  $('leg').style.display='flex';
+  var lim=RANGE?ld(new Date(Date.now()-RANGE*864e5)):'0000';
+  var all=PES.map(function(p,i){return {date:p.date,kg:p.kg,m:avg7(PES,i)};});
+  var pts=all.filter(function(p){return p.date>=lim;});
+  if(!pts.length)pts=all.slice(-1);
+  var obj=+CFG.objectif||null,W=340,H=200,L=34,R=8,T=10,B=24;
+  var t0=pd(pts[0].date).getTime(),t1=pd(pts[pts.length-1].date).getTime();
+  var showGoal=obj&&CFG.date&&CFG.date>pts[pts.length-1].date&&RANGE===0;
+  if(showGoal)t1=pd(CFG.date).getTime();
+  if(t1-t0<864e5*6){t0-=864e5*3;t1+=864e5*3;}
+  var vals=pts.map(function(p){return p.kg;});if(obj)vals.push(obj);
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  if(mx-mn<2){var c=(mx+mn)/2;mn=c-1;mx=c+1;}
+  mn=Math.floor(mn-0.5);mx=Math.ceil(mx+0.5);
+  function X(t){return L+(t-t0)/(t1-t0)*(W-L-R);}
+  function Y(v){return T+(mx-v)/(mx-mn)*(H-T-B);}
+  var grid=LT?'rgba(0,0,0,.08)':'rgba(255,255,255,.07)',txt=LT?'#7d7b87':'#6b6a75';
+  var h='<svg id="chart" viewBox="0 0 '+W+' '+H+'" font-family="-apple-system,sans-serif">';
+  var step=(mx-mn)<=6?1:(mx-mn)<=14?2:5;
+  for(var g=Math.ceil(mn/step)*step;g<=mx;g+=step){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(g).toFixed(1)+'" y2="'+Y(g).toFixed(1)+'" stroke="'+grid+'"/><text x="'+(L-5)+'" y="'+(Y(g)+3.5).toFixed(1)+'" font-size="10" fill="'+txt+'" text-anchor="end">'+g+'</text>';}
+  /* Dates en abscisse : 4 repères */
+  for(var k=0;k<4;k++){var tt=t0+(t1-t0)*k/3,d=new Date(tt);h+='<text x="'+X(tt).toFixed(1)+'" y="'+(H-7)+'" font-size="10" fill="'+txt+'" text-anchor="'+(k===0?'start':k===3?'end':'middle')+'">'+d.getDate()+' '+MOIS[d.getMonth()]+'</text>';}
+  if(obj)h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(obj).toFixed(1)+'" y2="'+Y(obj).toFixed(1)+'" stroke="#4ECDC4" stroke-width="1.5" stroke-dasharray="5 4"/>';
+  if(showGoal){var lp=pts[pts.length-1];h+='<line x1="'+X(pd(lp.date).getTime()).toFixed(1)+'" y1="'+Y(lp.kg).toFixed(1)+'" x2="'+X(pd(CFG.date).getTime()).toFixed(1)+'" y2="'+Y(obj).toFixed(1)+'" stroke="#4ECDC4" stroke-width="1.5" stroke-dasharray="2 4" opacity=".8"/><circle cx="'+X(pd(CFG.date).getTime()).toFixed(1)+'" cy="'+Y(obj).toFixed(1)+'" r="4" fill="#4ECDC4"/>';}
+  var line=pts.map(function(p,i){return (i?'L':'M')+X(pd(p.date).getTime()).toFixed(1)+' '+Y(p.kg).toFixed(1);}).join(' ');
+  var mline=pts.map(function(p,i){return (i?'L':'M')+X(pd(p.date).getTime()).toFixed(1)+' '+Y(p.m).toFixed(1);}).join(' ');
+  if(pts.length>1){
+    h+='<path d="'+line+' L'+X(pd(pts[pts.length-1].date).getTime()).toFixed(1)+' '+(H-B)+' L'+X(pd(pts[0].date).getTime()).toFixed(1)+' '+(H-B)+' Z" fill="rgba(92,107,192,.12)"/>';
+    h+='<path d="'+line+'" fill="none" stroke="#5C6BC0" stroke-width="2" stroke-linejoin="round"/>';
+    h+='<path d="'+mline+'" fill="none" stroke="#FFB74D" stroke-width="2" stroke-linejoin="round" opacity=".9"/>';
+  }
+  if(pts.length<=60)pts.forEach(function(p){h+='<circle cx="'+X(pd(p.date).getTime()).toFixed(1)+'" cy="'+Y(p.kg).toFixed(1)+'" r="2.8" fill="#5C6BC0" stroke="'+(LT?'#fff':'#1a1a22')+'" stroke-width="1.2"/>';});
+  h+='</svg>';
+  wrap.innerHTML=h;
+}
+
+var LIST_N=10;
+function renderList(){
+  $('n-pes').textContent=PES.length?PES.length+' au total':'';
+  if(!PES.length){$('list').innerHTML='<div class="empty" style="padding:8px">Aucune pesée pour l\'instant.</div>';return;}
+  var obj=+CFG.objectif||null,rev=PES.slice().reverse(),h='';
+  rev.slice(0,LIST_N).forEach(function(p,i){
+    var prev=rev[i+1],dl=prev?p.kg-prev.kg:null,good=obj&&prev?(obj<prev.kg?dl<0:dl>0):null;
+    h+='<div class="row"><div class="d">'+fdl(p.date)+(p.src==='hc'?' <small style="color:var(--t3)">· HC</small>':'')+'</div><div class="v">'+kg(p.kg)+' kg</div>'
+      +'<div class="dl" style="color:'+(dl==null||Math.abs(dl)<0.05?'var(--t3)':good?'var(--ok)':good===false?'var(--bad)':'var(--t2)')+'">'+(dl==null?'':(dl>0?'+':dl<0?'−':'±')+kg(Math.abs(dl)))+'</div>'
+      +'<button onclick="delPes(\''+p.date+'\')" aria-label="Supprimer">✕</button></div>';
+  });
+  if(PES.length>LIST_N)h+='<button class="more" onclick="LIST_N+=20;renderList()">Afficher plus</button>';
+  $('list').innerHTML=h;
+}
+function setRange(r){RANGE=r;prefSet('poids_range',String(r));renderChart();}
+
+/* ── Saisie ── */
+function closeSheets(){document.querySelectorAll('.sheet-bg').forEach(function(s){s.classList.remove('show');});}
+function openAdd(){$('in-date').value=ld(new Date());$('in-kg').value='';$('sh-add').classList.add('show');setTimeout(function(){$('in-kg').focus();},250);}
+function saveAdd(){
+  var d=$('in-date').value,v=parseFloat(String($('in-kg').value).replace(',','.'));
+  if(!d){alert('Choisis une date.');return;}
+  if(isNaN(v)||v<20||v>300){alert('Poids invalide.');return;}
+  PES=PES.filter(function(p){return p.date!==d;});
+  PES.push({date:d,kg:Math.round(v*10)/10,src:'m'});
+  savePes();closeSheets();render();
+}
+function delPes(d){
+  if(!confirm('Supprimer la pesée du '+fdl(d)+' ?'))return;
+  PES=PES.filter(function(p){return p.date!==d;});savePes();render();
+}
+function openObj(){
+  $('in-obj').value=CFG.objectif||'';$('in-objd').value=CFG.date||'';$('in-taille').value=CFG.taille||'';
+  $('sh-obj').classList.add('show');
+}
+function saveObj(){
+  var o=parseFloat(String($('in-obj').value).replace(',','.')),t=parseInt($('in-taille').value,10);
+  CFG.objectif=isNaN(o)?null:Math.round(o*10)/10;
+  CFG.date=$('in-objd').value||null;
+  CFG.taille=isNaN(t)?null:t;
+  saveCfg();closeSheets();render();
+}
+function clearAll(){
+  if(!confirm('Effacer toutes les pesées ? La courbe repartira de zéro.'))return;
+  PES=[];savePes();closeSheets();render();
+}
+
+/* ── Import Health Connect ── */
+function toast(msg){var t=$('toast');t.innerHTML=msg;t.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(function(){t.style.display='none';},6000);}
+var HC_WAIT=false;
+function importHC(){
+  if(typeof window.HealthBridge==='undefined'){toast('L\'import Health Connect n\'est disponible que dans l\'appli Android.');return;}
+  HC_WAIT=true;HC_SILENT=false;toast('Lecture des pesées dans Health Connect…');
+  try{HealthBridge.requestDataForPeriod('week');}catch(e){}
+}
+var HC_SILENT=false;
+window.onHealthData=function(d){
+  if(!HC_WAIT)return;HC_WAIT=false;
+  var silent=HC_SILENT;HC_SILENT=false;
+  if(silent&&(!d||d.status!=='ok'))return;
+  if(!d||d.status==='unavailable'){toast('Health Connect n\'est pas disponible sur ce téléphone.');return;}
+  if(d.status==='update_required'){toast('Mets à jour Health Connect depuis le Play Store, puis réessaie.');return;}
+  if(d.status==='denied'){toast('Autorise la lecture du poids dans Health Connect, puis réessaie.');return;}
+  if(d.status!=='ok'){toast('Lecture impossible : '+(d.message||d.status));return;}
+  var w=d.weights||[];
+  if(!w.length){toast('Aucune pesée trouvée dans Health Connect sur les 400 derniers jours.');return;}
+  /* Une pesée par jour : la première du jour (le matin en général) */
+  var byDay={};w.forEach(function(x){var k=ld(new Date(x.t));if(!byDay[k])byDay[k]=x.kg;});
+  var have={};PES.forEach(function(p){have[p.date]=1;});
+  var add=0;Object.keys(byDay).forEach(function(k){if(!have[k]&&byDay[k]>=20&&byDay[k]<=300){PES.push({date:k,kg:byDay[k],src:'hc'});add++;}});
+  if(add){savePes();render();}
+  if(silent&&!add)return;
+  toast(add?'✓ '+add+' pesée'+(add>1?'s':'')+' importée'+(add>1?'s':'')+' depuis Health Connect.':'Aucune nouvelle pesée : tout est déjà à jour.');
+};
+window.onBackKey=function(){var o=document.querySelector('.sheet-bg.show');if(o){closeSheets();return true;}return false;};
+
+render();
+/* Import automatique discret à l'ouverture si des pesées viennent déjà de Health Connect */
+if(PES.some(function(p){return p.src==='hc';})&&typeof window.HealthBridge!=='undefined'){HC_WAIT=true;HC_SILENT=true;try{HealthBridge.requestDataForPeriod('week');}catch(e){}}
+</script>
+</body>
+</html>
