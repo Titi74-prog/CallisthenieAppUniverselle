@@ -27,8 +27,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 #header-date{font-size:10px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
 #tabs{display:none;background:#1a1a22;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)}
 #tabs::-webkit-scrollbar{display:none}
-.tab{flex:1;min-width:0;padding:9px 4px;font-size:11px;font-weight:700;color:var(--txt3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;text-align:center;transition:color .2s;white-space:nowrap}
-.tab .tab-sub{display:block;font-size:9px;font-weight:500;margin-top:2px;color:var(--txt3)}
+.tab{flex:1;min-width:0;padding:9px 4px;font-size:11px;font-weight:700;color:var(--txt3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;text-align:center;transition:color .2s;white-space:nowrap;overflow:hidden}
+.tab .tab-sub{display:block;font-size:9px;font-weight:500;margin-top:2px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis}
 .tab.active .tab-sub{color:inherit}
 #content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:70px}
 .session-header{padding:14px 16px;background:#1a1a22;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
