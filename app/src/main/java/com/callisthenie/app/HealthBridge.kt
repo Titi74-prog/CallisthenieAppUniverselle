@@ -4,7 +4,7 @@ import android.content.Intent
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityReshultLauncher
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.PermissionController
@@ -19,6 +19,7 @@ import androidx.health.connect.client.records.FloorsClimbedRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.records.RestingHeartRateRecord
 import androidx.health.connect.client.records.SkinTemperatureRecord
@@ -76,7 +77,8 @@ class HealthBridge(private val activity: ComponentActivity, private val webView:
         HealthPermission.getReadPermission(RestingHeartRateRecord::class),
         HealthPermission.getReadPermission(HeartRateVariabilityRmssdRecord::class),
         HealthPermission.getReadPermission(Vo2MaxRecord::class),
-        HealthPermission.getReadPermission(OxygenSaturationRecord::class)
+        HealthPermission.getReadPermission(OxygenSaturationRecord::class),
+        HealthPermission.getReadPermission(NutritionRecord::class)
     )
     /** Température cutanée : demandée seulement si Health Connect la prend en charge sur ce téléphone */
     private val skinTempPermission = HealthPermission.getReadPermission(SkinTemperatureRecord::class)
@@ -245,6 +247,7 @@ class HealthBridge(private val activity: ComponentActivity, private val webView:
         if (!calEnd.isBefore(firstDay)) safe { sessions(client, granted, byDay, firstDay, calEnd, today, zone, now) }
         out.put("days", days)
 
+        readNutrition(client, granted, out, byDay, firstDay, today, zone, now)
         readBody(client, granted, out, now)
         readSleep(client, granted, out, zone, now)
         readHeart(client, granted, out, today, zone, now)
@@ -294,6 +297,59 @@ class HealthBridge(private val activity: ComponentActivity, private val webView:
                 )
             )[ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL]?.inKilocalories ?: 0.0
         } catch (_: Exception) { 0.0 }
+    }
+
+    // ───────── Nutrition (Foodvisor → Health Connect) ─────────
+
+    private suspend fun readNutrition(
+        client: HealthConnectClient, granted: Set<String>, out: JSONObject,
+        byDay: Map<LocalDate, JSONObject>, firstDay: LocalDate, today: LocalDate,
+        zone: ZoneId, now: Instant
+    ) {
+        if (!has(granted, "READ_NUTRITION")) return
+        safe {
+            val winStart = firstDay.atStartOfDay(zone).toInstant()
+            val winEnd = if (!today.isBefore(firstDay)) now else firstDay.plusDays(1).atStartOfDay(zone).toInstant()
+            val entries = JSONArray()
+            var token: String? = null
+            do {
+                val resp = client.readRecords(
+                    ReadRecordsRequest(
+                        NutritionRecord::class,
+                        TimeRangeFilter.between(winStart, winEnd),
+                        ascendingOrder = true, pageSize = 1000, pageToken = token
+                    )
+                )
+                for (r in resp.records) {
+                    val day = r.startTime.atZone(zone).toLocalDate()
+                    // Agrégation par jour : calories consommées + macros
+                    byDay[day]?.let { o ->
+                        val kcal = r.energy?.inKilocalories ?: 0.0
+                        val prot = r.protein?.inGrams ?: 0.0
+                        val carb = r.totalCarbohydrate?.inGrams ?: 0.0
+                        val fat  = r.totalFat?.inGrams ?: 0.0
+                        o.put("consumed", (o.optDouble("consumed", 0.0) + kcal).let { Math.round(it) })
+                        o.put("protein",  round1(o.optDouble("protein", 0.0) + prot))
+                        o.put("carbs",    round1(o.optDouble("carbs", 0.0) + carb))
+                        o.put("fat",      round1(o.optDouble("fat", 0.0) + fat))
+                    }
+                    // Entrée individuelle
+                    val e = JSONObject()
+                        .put("id", r.metadata.id)
+                        .put("start", r.startTime.toString())
+                        .put("end", r.endTime.toString())
+                        .put("kcal", Math.round(r.energy?.inKilocalories ?: 0.0))
+                        .put("name", r.name ?: "")
+                        .put("mealType", r.mealType)
+                        .put("protein", round1(r.protein?.inGrams ?: 0.0))
+                        .put("carbs", round1(r.totalCarbohydrate?.inGrams ?: 0.0))
+                        .put("fat", round1(r.totalFat?.inGrams ?: 0.0))
+                    entries.put(e)
+                }
+                token = resp.pageToken
+            } while (token != null)
+            out.put("nutrition", entries)
+        }
     }
 
     // ───────── Corps, sommeil, cœur ─────────
