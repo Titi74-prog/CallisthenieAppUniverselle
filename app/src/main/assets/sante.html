@@ -102,6 +102,26 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
       </div>
     </div>
 
+    <div class="card" id="deficit-card" style="display:none">
+      <div class="card-title">🔥 Déficit calorique <b id="def-d">aujourd'hui</b></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <div class="mini" style="flex:1"><div class="mini-l">Consommé</div><div class="mini-v" id="def-in" style="color:#FF7043">—</div><div class="mini-s">kcal</div></div>
+        <div class="mini" style="flex:1"><div class="mini-l">Brûlé</div><div class="mini-v" id="def-out" style="color:#4ECDC4">—</div><div class="mini-s">kcal</div></div>
+        <div class="mini" style="flex:1"><div class="mini-l">Déficit</div><div class="mini-v" id="def-val" style="font-weight:900">—</div><div class="mini-s" id="def-sub">kcal</div></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="mini" style="flex:1"><div class="mini-l">Protéines</div><div class="mini-v" id="def-p">—</div><div class="mini-s">g</div></div>
+        <div class="mini" style="flex:1"><div class="mini-l">Glucides</div><div class="mini-v" id="def-c">—</div><div class="mini-s">g</div></div>
+        <div class="mini" style="flex:1"><div class="mini-l">Lipides</div><div class="mini-v" id="def-f">—</div><div class="mini-s">g</div></div>
+      </div>
+      <div class="note" id="def-goal-note"></div>
+    </div>
+
+    <div class="card" id="nutri-card" style="display:none">
+      <div class="card-title">🍽️ Repas <b id="nutri-n"></b><button style="background:var(--acc);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer" onclick="openNutri()">+ Ajouter</button></div>
+      <div id="nutri-list"></div>
+    </div>
+
     <div class="per">
       <button class="nav" id="w-prev" onclick="weekNav(-1)">◀</button>
       <button data-p="week" onclick="setPeriod('week')">Semaine</button>
@@ -163,9 +183,33 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
       <div class="f"><label>Pas / jour</label><input type="number" id="o-steps" inputmode="numeric" step="500" min="0"></div>
       <div class="f"><label>Calories actives</label><input type="number" id="o-act" inputmode="numeric" step="50" min="0"></div>
     </div>
-    <div class="f"><label>Sommeil (heures)</label><input type="number" id="o-sleep" inputmode="decimal" step="0.5" min="0" max="14"></div>
+    <div class="frow">
+      <div class="f"><label>Sommeil (heures)</label><input type="number" id="o-sleep" inputmode="decimal" step="0.5" min="0" max="14"></div>
+      <div class="f"><label>Calories conso.</label><input type="number" id="o-conso" inputmode="numeric" step="50" min="0" placeholder="ex: 2000"></div>
+    </div>
     <div class="btns"><button class="btn btn-sec" onclick="closeObj()">Annuler</button><button class="btn btn-main" onclick="saveObj()">✓ Enregistrer</button></div>
     <div class="btns" style="margin-top:10px"><button class="btn btn-sec" onclick="hcSettings()">⚙️ Sources Health Connect</button></div>
+  </div>
+</div>
+
+<div class="sheet-bg" id="sh-nutri" onclick="if(event.target===this)closeNutri()">
+  <div class="sheet">
+    <h2 id="nutri-title">🍽️ Ajouter un repas</h2>
+    <div class="f"><label>Nom / aliment</label><input type="text" id="n-name" placeholder="ex: Poulet grillé + riz"></div>
+    <div class="frow">
+      <div class="f"><label>Calories (kcal)</label><input type="number" id="n-kcal" inputmode="numeric" step="10" min="0"></div>
+      <div class="f"><label>Type de repas</label><select id="n-meal" style="width:100%;background:var(--in);border:1px solid var(--bd);border-radius:10px;color:var(--t);font-size:15px;font-weight:700;padding:10px 12px;font-family:inherit;-webkit-appearance:none">
+        <option value="0">Inconnu</option><option value="1">Petit-déj</option><option value="2">Déjeuner</option><option value="3">Dîner</option><option value="4">Collation</option>
+      </select></div>
+    </div>
+    <div class="frow">
+      <div class="f"><label>Protéines (g)</label><input type="number" id="n-prot" inputmode="decimal" step="1" min="0"></div>
+      <div class="f"><label>Glucides (g)</label><input type="number" id="n-carbs" inputmode="decimal" step="1" min="0"></div>
+      <div class="f"><label>Lipides (g)</label><input type="number" id="n-fat" inputmode="decimal" step="1" min="0"></div>
+    </div>
+    <input type="hidden" id="n-id">
+    <div class="btns"><button class="btn btn-sec" onclick="closeNutri()">Annuler</button><button class="btn btn-main" onclick="saveNutri()">✓ Enregistrer</button></div>
+    <div class="btns" id="n-del-row" style="margin-top:8px;display:none"><button class="btn btn-sec" style="color:var(--bad)" onclick="delNutri()">🗑 Supprimer</button></div>
   </div>
 </div>
 
@@ -188,10 +232,10 @@ function jGet(k,def){try{var v=JSON.parse(prefGet(k));return v==null?def:v;}catc
 function cacheGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
 function cacheSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
-var OBJ=Object.assign({steps:8000,active:400,sleep:7.5},jGet('sante_obj',{}));
+var OBJ=Object.assign({steps:8000,active:400,sleep:7.5,kcal_conso:2000},jGet('sante_obj',{}));
 var PERIOD=prefGet('sante_period')||'week',WEEK_OFF=0,METRIC=prefGet('sante_metric')||'steps',DATA=null;
 
-var JOURS=['Di','Lu','Ma','Me','Je','Ve','Sa'],JOURS_L=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+var JOURS=['Di','Lu','Ma','Me','Je','Ve','Sa'],JOURS_M=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
 var MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
 function ld(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function pd(s){return new Date(s+'T12:00:00');}
@@ -263,7 +307,7 @@ function render(){
   $('m-km').textContent=td.km!=null?d1(td.km):'—';
   $('m-fl').textContent=td.floors!=null?nf(td.floors):'—';
 
-  renderChart(d);renderActs(d);renderSleep(d);
+  renderDeficit(d);renderNutrition(d);renderChart(d);renderActs(d);renderSleep(d);
 
   /* Cœur */
   var rhr=(d.days||[]).filter(function(x){return x.rhr;}).slice(-1)[0];
@@ -359,14 +403,106 @@ function setMetric(m){METRIC=m;prefSet('sante_metric',m);if(DATA)renderChart(DAT
 function loadCache(){var c=cacheGet('sante_cache_'+(PERIOD==='week'?'week'+WEEK_OFF:PERIOD));if(c){DATA=c;render();}}
 
 /* ── Objectifs ── */
-function openObj(){$('o-steps').value=OBJ.steps;$('o-act').value=OBJ.active;$('o-sleep').value=OBJ.sleep;$('sh-obj').classList.add('show');}
+function openObj(){$('o-steps').value=OBJ.steps;$('o-act').value=OBJ.active;$('o-sleep').value=OBJ.sleep;$('o-conso').value=OBJ.kcal_conso||2000;$('sh-obj').classList.add('show');}
 function closeObj(){$('sh-obj').classList.remove('show');}
 function saveObj(){
-  var s=parseInt($('o-steps').value,10),a=parseInt($('o-act').value,10),sl=parseFloat(String($('o-sleep').value).replace(',','.'));
-  if(!isNaN(s))OBJ.steps=Math.max(0,s);if(!isNaN(a))OBJ.active=Math.max(0,a);if(!isNaN(sl))OBJ.sleep=Math.max(0,Math.min(14,sl));
+  var s=parseInt($('o-steps').value,10),a=parseInt($('o-act').value,10),sl=parseFloat(String($('o-sleep').value).replace(',','.')),co=parseInt($('o-conso').value,10);
+  if(!isNaN(s))OBJ.steps=Math.max(0,s);if(!isNaN(a))OBJ.active=Math.max(0,a);if(!isNaN(sl))OBJ.sleep=Math.max(0,Math.min(14,sl));if(!isNaN(co))OBJ.kcal_conso=Math.max(0,co);
   prefSet('sante_obj',JSON.stringify(OBJ));closeObj();if(DATA)render();
 }
-window.onBackKey=function(){if($('sh-obj').classList.contains('show')){closeObj();return true;}return false;};
+window.onBackKey=function(){if($('sh-nutri').classList.contains('show')){closeNutri();return true;}if($('sh-obj').classList.contains('show')){closeObj();return true;}return false;};
+
+/* ── Déficit calorique ── */
+var MEAL_LABELS=['','🌅 Petit-déj','☀️ Déjeuner','🌙 Dîner','🍎 Collation'];
+function renderDeficit(d){
+  var td=todayRow(d)||{};
+  var manual=getManualEntries(ld(new Date()));
+  var consumed=(td.consumed||0)+manual.reduce(function(a,e){return a+e.kcal;},0);
+  var prot=(td.protein||0)+manual.reduce(function(a,e){return a+(e.protein||0);},0);
+  var carbs=(td.carbs||0)+manual.reduce(function(a,e){return a+(e.carbs||0);},0);
+  var fat=(td.fat||0)+manual.reduce(function(a,e){return a+(e.fat||0);},0);
+  var burned=td.kcal||0;
+  var deficit=burned-consumed;
+  var hasData=consumed>0||burned>0;
+  $('deficit-card').style.display=hasData?'block':'none';
+  if(!hasData)return;
+  $('def-in').textContent=nf(consumed);
+  $('def-out').textContent=nf(burned);
+  $('def-val').textContent=(deficit>=0?'+':'')+nf(deficit);
+  $('def-val').style.color=deficit>=0?'var(--ok)':'var(--bad)';
+  $('def-sub').textContent=deficit>=0?'déficit':'excédent';
+  $('def-p').textContent=d1(prot);$('def-c').textContent=d1(carbs);$('def-f').textContent=d1(fat);
+  var goal=OBJ.kcal_conso||0;
+  $('def-goal-note').textContent=goal?'Objectif : '+nf(goal)+' kcal · '+(consumed<=goal?'✅ dans l\'objectif':'⚠️ '+(nf(consumed-goal))+' kcal au-dessus'):'';
+}
+
+function renderNutrition(d){
+  var today=ld(new Date());
+  var entries=[];
+  (d.nutrition||[]).forEach(function(e){
+    if(e.start&&e.start.slice(0,10)===today)entries.push({id:e.id,name:e.name||'Aliment',kcal:e.kcal||0,mealType:e.mealType||0,protein:e.protein||0,carbs:e.carbs||0,fat:e.fat||0,start:e.start,source:'hc'});
+  });
+  getManualEntries(today).forEach(function(e){entries.push(Object.assign({source:'manual'},e));});
+  $('nutri-card').style.display=(entries.length||DATA)?'block':'none';
+  $('nutri-n').textContent=entries.length?entries.length+' enregistré'+(entries.length>1?'s':''):'';
+  if(!entries.length){$('nutri-list').innerHTML='<div class="empty">Aucun repas enregistré aujourd\'hui.<br>Ajoute un repas manuellement ou utilise Foodvisor.</div>';return;}
+  entries.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
+  $('nutri-list').innerHTML=entries.map(function(e){
+    var ml=MEAL_LABELS[e.mealType]||(e.mealType?'Repas':'');
+    var time=e.start?hhmm(e.start):'';
+    var canEdit=e.source==='manual';
+    return '<div class="act" style="cursor:'+(canEdit?'pointer':'default')+'" '+(canEdit?'onclick="editNutri(\''+e.id+'\')"':'')+'>'
+      +'<div class="ic">'+(ml?ml.split(' ')[0]:'🍽️')+'</div>'
+      +'<div class="nm">'+escH(e.name)+'<small>'+(ml?ml.split(' ').slice(1).join(' ')+' · ':'')+(time?time+' · ':'')+'P:'+d1(e.protein)+'g · G:'+d1(e.carbs)+'g · L:'+d1(e.fat)+'g'+(canEdit?' · ✏️':'')+'</small></div>'
+      +'<div class="kc">'+nf(e.kcal)+' kcal</div></div>';
+  }).join('');
+}
+
+/* ── Entrées manuelles (stockées en prefs) ── */
+function getManualEntries(date){return jGet('nutri_manual_'+date,[]);}
+function saveManualEntries(date,arr){prefSet('nutri_manual_'+date,JSON.stringify(arr));}
+function openNutri(edit){
+  $('nutri-title').textContent=edit?'✏️ Modifier le repas':'🍽️ Ajouter un repas';
+  $('n-id').value=edit?edit.id:'';
+  $('n-name').value=edit?edit.name:'';
+  $('n-kcal').value=edit?edit.kcal:'';
+  $('n-meal').value=edit?edit.mealType:2;
+  $('n-prot').value=edit?edit.protein:'';
+  $('n-carbs').value=edit?edit.carbs:'';
+  $('n-fat').value=edit?edit.fat:'';
+  $('n-del-row').style.display=edit?'flex':'none';
+  $('sh-nutri').classList.add('show');
+}
+function closeNutri(){$('sh-nutri').classList.remove('show');}
+function saveNutri(){
+  var today=ld(new Date());
+  var id=$('n-id').value||('m_'+Date.now());
+  var entry={
+    id:id,name:$('n-name').value||'Repas',
+    kcal:parseInt($('n-kcal').value,10)||0,
+    mealType:parseInt($('n-meal').value,10)||0,
+    protein:parseFloat($('n-prot').value)||0,
+    carbs:parseFloat($('n-carbs').value)||0,
+    fat:parseFloat($('n-fat').value)||0,
+    start:new Date().toISOString()
+  };
+  var arr=getManualEntries(today);
+  var idx=arr.findIndex(function(e){return e.id===id;});
+  if(idx>=0){entry.start=arr[idx].start;arr[idx]=entry;}else arr.push(entry);
+  saveManualEntries(today,arr);
+  closeNutri();if(DATA)render();
+}
+function editNutri(id){
+  var arr=getManualEntries(ld(new Date()));
+  var e=arr.find(function(x){return x.id===id;});
+  if(e)openNutri(e);
+}
+function delNutri(){
+  var id=$('n-id').value;if(!id)return;
+  var today=ld(new Date()),arr=getManualEntries(today);
+  saveManualEntries(today,arr.filter(function(e){return e.id!==id;}));
+  closeNutri();if(DATA)render();
+}
 
 loadCache();
 refresh();
